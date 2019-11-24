@@ -41,18 +41,15 @@ class DummyRenderer : Renderer {
 
     override fun onCreate() {
         val vertices = floatArrayOf(
-            // Left bottom triangle
-            -0.5f, 0.5f, 0f,
-            -0.5f, -0.5f, 0f,
-            0.5f, -0.5f, 0f,
-
-            // Right top triangle
-            0.5f, -0.5f, 0f,
-            0.5f, 0.5f, 0f,
-            -0.5f, 0.5f, 0f
+            -0.5f, 0.5f, 0.0f,
+            -0.5f, -0.5f, 0.0f,
+            0.5f, -0.5f, 0.0f,
+            0.5f, 0.5f, 0.0f
         )
 
-        geoms.add(Mesh("Quad").createSimple(vertices, IntArray(0), FloatArray(0)))
+        val indeces = intArrayOf(0, 1, 3, 3, 1, 2)
+
+        geoms.add(Mesh("Quad").createSimple(vertices, indeces))
 
         glEnable(GL_DEPTH_TEST)
 

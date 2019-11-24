@@ -36,29 +36,37 @@ import org.lwjgl.system.MemoryUtil
 import java.lang.RuntimeException
 import java.nio.Buffer
 import java.nio.FloatBuffer
+import java.nio.IntBuffer
 
 /**
  * @author Vlad Ravenholm on 11/24/2019
  */
-data class VertexBufferObject(val id: Int, val buffer: Buffer, val type: BufferType) : Disposable {
-    private var finalSize: Int? = null
+data class VertexBufferObject(val buffer: Buffer, val type: BufferType) : Disposable {
+    val id: Int = glGenBuffers()
 
-    fun initialize(free: Boolean = false) {
-        glBindBuffer(GL_ARRAY_BUFFER, id)
-        when (buffer) {
-            is FloatBuffer -> glBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_DRAW)
-            else -> throw RuntimeException("No such buffer type! ${buffer.javaClass}")
+    var size: Int = 0
+        private set
+
+    fun initialize(free: Boolean = false) { // we may want to not free it, to make collisions shapes later
+        // Idea: Free it on render in release, and in a debug/editing flag the buffer will persist, also free it if the scene is unloaded
+        when (type) {
+            BufferType.Vertex -> {
+                glBindBuffer(GL_ARRAY_BUFFER, id)
+                glBufferData(GL_ARRAY_BUFFER, buffer as FloatBuffer, GL_STATIC_DRAW)
+                glVertexAttribPointer(0, type.size, GL_FLOAT, false, 0, 0)
+                glBindBuffer(GL_ARRAY_BUFFER, 0)
+            }
+            BufferType.Indices -> {
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id)
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, buffer as IntBuffer, GL_STATIC_DRAW)
+            }
+            else -> throw RuntimeException("No such vbo type! ${buffer.javaClass}")
         }
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0)
-        glBindBuffer(GL_ARRAY_BUFFER, 0)
-
-        finalSize = buffer.limit() / type.size
+        size = buffer.limit()
         if (free)
             MemoryUtil.memFree(buffer)
     }
-
-    fun size() = finalSize ?: buffer.limit() / type.size
 
     override fun free() {
         glDeleteBuffers(id)

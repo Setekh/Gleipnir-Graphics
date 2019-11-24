@@ -31,22 +31,23 @@ package eu.corvus.corax.scene.geometry.buffers
 
 import eu.corvus.corax.utils.Disposable
 import org.lwjgl.opengl.GL30
-import java.nio.Buffer
 
 /**
  * @author Vlad Ravenholm on 11/24/2019
  */
 data class VertexArrayObject(
-    val id: Int,
     val vertexBuffers: Map<BufferType, VertexBufferObject> = mutableMapOf()
 ): Disposable {
+    val id: Int = GL30.glGenVertexArrays()
     private val mVertexBuffers = vertexBuffers as MutableMap
 
     fun createBuffers(body : MutableMap<BufferType, VertexBufferObject>.() -> Unit) {
         body.invoke(mVertexBuffers)
 
         GL30.glBindVertexArray(id)
-        vertexBuffers[BufferType.Vertex]?.initialize()
+        for (value in vertexBuffers.values) {
+            value.initialize()
+        }
         GL30.glBindVertexArray(0)
     }
 

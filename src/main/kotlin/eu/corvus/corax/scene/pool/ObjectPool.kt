@@ -1,5 +1,6 @@
 package eu.corvus.corax.scene.pool
 
+import com.sun.media.jfxmediaimpl.MediaDisposer
 import eu.corvus.corax.scene.Object
 
 /**
@@ -7,5 +8,5 @@ import eu.corvus.corax.scene.Object
  */
 interface ObjectPool {
     fun create()
-    fun free(obj: Object) // is Geometry && find disposaable data like Mesh
+    fun free(obj: MediaDisposer.Disposable) // is Geometry && find disposaable data like Mesh
 }
