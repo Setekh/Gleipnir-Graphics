@@ -3,6 +3,8 @@ package eu.corvus.corax.scene.geometry
 import eu.corvus.corax.scene.geometry.buffers.BufferType
 import eu.corvus.corax.scene.geometry.buffers.VertexArrayObject
 import eu.corvus.corax.scene.geometry.buffers.VertexBufferObject
+import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL30
 import org.lwjgl.opengl.GL30.*
 import org.lwjgl.system.MemoryUtil
 
@@ -28,5 +30,19 @@ class Mesh(name: String = "Mesh"): Geometry(name) {
         glObject = vao
 
         return this
+    }
+
+    override fun render() {
+        val vao = glObject ?: return
+
+        glBindVertexArray(vao.id)
+
+        // Render the vertex buffer
+        val vbo = vao.vertexBuffers[BufferType.Vertex] ?: error("Missing vertex buffer!")
+        glEnableVertexAttribArray(vbo.type.ordinal)
+        glDrawArrays(GL11.GL_TRIANGLES, 0, vbo.size())
+        glDisableVertexAttribArray(0)
+
+        glBindVertexArray(0)
     }
 }

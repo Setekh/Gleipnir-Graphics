@@ -153,6 +153,8 @@ class DesktopApp(
     }
 
     override fun onDestroy() {
+        renderer.onDestroy()
+
         // Free the window callbacks and destroy the window
         glfwFreeCallbacks(window)
         glfwDestroyWindow(window)

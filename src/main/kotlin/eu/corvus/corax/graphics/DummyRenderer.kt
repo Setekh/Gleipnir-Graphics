@@ -31,10 +31,7 @@ package eu.corvus.corax.graphics
 
 import eu.corvus.corax.scene.geometry.Geometry
 import eu.corvus.corax.scene.geometry.Mesh
-import eu.corvus.corax.scene.geometry.buffers.BufferType
-import org.joml.GeometryUtils
-import org.lwjgl.opengl.GL11
-import org.lwjgl.opengl.GL30
+import org.lwjgl.opengl.GL30.*
 
 /**
  * @author Vlad Ravenholm on 11/24/2019
@@ -57,10 +54,10 @@ class DummyRenderer : Renderer {
 
         geoms.add(Mesh("Quad").createSimple(vertices, IntArray(0), FloatArray(0)))
 
-        GL30.glEnable(GL30.GL_DEPTH_TEST)
+        glEnable(GL_DEPTH_TEST)
 
         // Set the clear color
-        GL30.glClearColor(0.13f, 0.13f, 0.13f, 0.13f)
+        glClearColor(0.13f, 0.13f, 0.13f, 0.13f)
     }
 
     override fun onPreRender() {
@@ -71,19 +68,10 @@ class DummyRenderer : Renderer {
     }
 
     override fun onRender() {
-        GL30.glClear(GL30.GL_COLOR_BUFFER_BIT or GL30.GL_DEPTH_BUFFER_BIT)
+        glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
         geoms.forEach {
-            it as Mesh
-            val vao = it.glObject!! // delegate to mesh?
-
-            GL30.glBindVertexArray(vao.id)
-
-            GL30.glEnableVertexAttribArray(0)
-            GL30.glDrawArrays(GL11.GL_TRIANGLES, 0, vao.vertexBuffers[BufferType.Vertex]!!.size())
-            GL30.glDisableVertexAttribArray(0)
-
-            GL30.glBindVertexArray(0)
+            it.render()
         }
     }
 
