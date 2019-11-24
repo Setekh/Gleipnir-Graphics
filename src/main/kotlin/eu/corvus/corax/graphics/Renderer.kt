@@ -4,9 +4,11 @@ import eu.corvus.corax.scene.geometry.Geometry
 
 /**
  * @author Vlad Ravenholm on 11/24/2019
- *
- **/
+ */
 interface Renderer {
-    fun preRender(geometry: Geometry)
-    fun render(geometry: Geometry)
+    fun onCreate()
+
+    fun onPreRender()
+    fun onRender()
+    fun onDestroy()
 }

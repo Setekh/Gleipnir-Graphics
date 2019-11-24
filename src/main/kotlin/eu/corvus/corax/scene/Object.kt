@@ -7,7 +7,7 @@ import org.koin.core.inject
 
 /**
  * @author Vlad Ravenholm on 11/24/2019
- **/
+ */
 open class Object: KoinComponent {
     private val objectPool by inject<ObjectPool>() // TODO mby use an objectId
 
