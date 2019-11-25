@@ -31,16 +31,13 @@ package eu.corvus.corax.app.shells
 
 import eu.corvus.corax.app.GleipnirApplication
 import eu.corvus.corax.graphics.Renderer
-import org.joml.Quaterniond
-import org.lwjgl.BufferUtils.createFloatBuffer
 import org.lwjgl.Version
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.opengl.GL
-import org.lwjgl.opengl.GL11
-import org.lwjgl.opengl.GL20
-import org.lwjgl.opengl.GL30.*
+import org.lwjgl.opengl.GL30.GL_TRUE
+import org.lwjgl.opengl.GL30.glViewport
 import org.lwjgl.system.MemoryStack.stackPush
 import org.lwjgl.system.MemoryUtil.NULL
 
@@ -58,7 +55,8 @@ class DesktopApp(
     private var width = 300
 
     init {
-        println("LWJGL " + Version.getVersion() + "!")
+        println("LWJGL ${Version.getVersion()} GLFW ${glfwGetVersionString()}!")
+
         startLifeCycle()
     }
 
@@ -75,6 +73,11 @@ class DesktopApp(
         glfwDefaultWindowHints() // optional, the current window hints are already the default
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE) // the window will stay hidden after creation
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE) // the window will be resizable
+
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3)
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2)
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE)
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
 
         // Create the window
         window = glfwCreateWindow(300, 300, title, NULL, NULL)

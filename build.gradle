@@ -1,11 +1,11 @@
 plugins {
-    id 'java'
-    id 'application'
-    id 'org.jetbrains.kotlin.jvm' version '1.3.41'
+    id "java"
+    id "application"
+    id "org.jetbrains.kotlin.jvm" version "1.3.41"
 }
 
-group 'corvus-corax'
-version '1.0-SNAPSHOT'
+group "corvus-corax"
+version "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -18,42 +18,43 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
-    implementation 'org.lwjgl:lwjgl:3.2.3'
-    implementation 'org.lwjgl:lwjgl:3.2.3:natives-windows'
-    implementation 'org.lwjgl:lwjgl:3.2.3:natives-macos'
-    implementation 'org.lwjgl:lwjgl:3.2.3:natives-linux'
+    def lwjgl_version = "3.2.3" // TODO report@lwjgl on this version "-XstartOnFirstThread" is not displayed, only a segfault on mac
+    implementation "org.lwjgl:lwjgl:$lwjgl_version"
+    implementation "org.lwjgl:lwjgl:$lwjgl_version:natives-windows"
+    implementation "org.lwjgl:lwjgl:$lwjgl_version:natives-macos"
+    implementation "org.lwjgl:lwjgl:$lwjgl_version:natives-linux"
 
 
-    implementation 'org.lwjgl:lwjgl-assimp:3.2.3'
-    implementation 'org.lwjgl:lwjgl-assimp:3.2.3:natives-windows'
-    implementation 'org.lwjgl:lwjgl-assimp:3.2.3:natives-macos'
-    implementation 'org.lwjgl:lwjgl-assimp:3.2.3:natives-linux'
+    implementation "org.lwjgl:lwjgl-assimp:$lwjgl_version"
+    implementation "org.lwjgl:lwjgl-assimp:$lwjgl_version:natives-windows"
+    implementation "org.lwjgl:lwjgl-assimp:$lwjgl_version:natives-macos"
+    implementation "org.lwjgl:lwjgl-assimp:$lwjgl_version:natives-linux"
 
 
-    implementation 'org.lwjgl:lwjgl-glfw:3.2.3'
-    implementation 'org.lwjgl:lwjgl-glfw:3.2.3:natives-windows'
-    implementation 'org.lwjgl:lwjgl-glfw:3.2.3:natives-macos'
-    implementation 'org.lwjgl:lwjgl-glfw:3.2.3:natives-linux'
+    implementation "org.lwjgl:lwjgl-glfw:$lwjgl_version"
+    implementation "org.lwjgl:lwjgl-glfw:$lwjgl_version:natives-windows"
+    implementation "org.lwjgl:lwjgl-glfw:$lwjgl_version:natives-macos"
+    implementation "org.lwjgl:lwjgl-glfw:$lwjgl_version:natives-linux"
 
 
-    implementation 'org.lwjgl:lwjgl-stb:3.2.3'
-    implementation 'org.lwjgl:lwjgl-stb:3.2.3:natives-windows'
-    implementation 'org.lwjgl:lwjgl-stb:3.2.3:natives-macos'
-    implementation 'org.lwjgl:lwjgl-stb:3.2.3:natives-linux'
+    implementation "org.lwjgl:lwjgl-stb:$lwjgl_version"
+    implementation "org.lwjgl:lwjgl-stb:$lwjgl_version:natives-windows"
+    implementation "org.lwjgl:lwjgl-stb:$lwjgl_version:natives-macos"
+    implementation "org.lwjgl:lwjgl-stb:$lwjgl_version:natives-linux"
 
 
-    implementation 'org.lwjgl:lwjgl-opengl:3.2.3'
-    implementation 'org.lwjgl:lwjgl-opengl:3.2.3:natives-windows'
-    implementation 'org.lwjgl:lwjgl-opengl:3.2.3:natives-macos'
-    implementation 'org.lwjgl:lwjgl-opengl:3.2.3:natives-linux'
+    implementation "org.lwjgl:lwjgl-opengl:$lwjgl_version"
+    implementation "org.lwjgl:lwjgl-opengl:$lwjgl_version:natives-windows"
+    implementation "org.lwjgl:lwjgl-opengl:$lwjgl_version:natives-macos"
+    implementation "org.lwjgl:lwjgl-opengl:$lwjgl_version:natives-linux"
 
 
-    implementation 'org.lwjgl:lwjgl-openal:3.2.3'
-    implementation 'org.lwjgl:lwjgl-openal:3.2.3:natives-windows'
-    implementation 'org.lwjgl:lwjgl-openal:3.2.3:natives-macos'
-    implementation 'org.lwjgl:lwjgl-openal:3.2.3:natives-linux'
+    implementation "org.lwjgl:lwjgl-openal:$lwjgl_version"
+    implementation "org.lwjgl:lwjgl-openal:$lwjgl_version:natives-windows"
+    implementation "org.lwjgl:lwjgl-openal:$lwjgl_version:natives-macos"
+    implementation "org.lwjgl:lwjgl-openal:$lwjgl_version:natives-linux"
 
-    implementation 'org.joml:joml:1.9.19'
+    implementation "org.joml:joml:1.9.19"
 }
 
 compileKotlin {
