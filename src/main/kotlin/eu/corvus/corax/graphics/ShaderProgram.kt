@@ -2,21 +2,51 @@ package eu.corvus.corax.graphics
 
 import eu.corvus.corax.scene.Object
 import org.lwjgl.opengl.GL20.*
+import java.nio.FloatBuffer
+import org.lwjgl.system.MemoryStack
+import org.joml.Matrix4f
+import java.util.HashMap
+
+
 
 /**
  * stolen
  */
 class ShaderProgram: Object() {
-    private val programId: Int = glCreateProgram()
-
+    private var programId: Int
     private var vertexShaderId: Int = 0
-
     private var fragmentShaderId: Int = 0
+    private var uniforms: MutableMap<String, Int> = mutableMapOf()
 
     init {
+        programId = glCreateProgram()
         if (programId == 0) {
             throw Exception("Could not create Shader")
         }
+    }
+
+    fun createUniform(uniformName: String) {
+        val uniformLocation = glGetUniformLocation(programId, uniformName)
+        if (uniformLocation < 0) {
+            throw Exception("Could not find uniform:$uniformName")
+        }
+
+        uniforms[uniformName] = uniformLocation
+    }
+
+    fun setUniform(uniformName: String, value: Matrix4f) {
+        val uniform = uniforms[uniformName] ?: return
+        MemoryStack.stackPush().use { stack ->
+            // Dump the matrix into a float buffer
+            val fb = stack.mallocFloat(16)
+            value.get(fb)
+            glUniformMatrix4fv(uniform, false, fb)
+        }
+    }
+
+    fun setUniform(uniformName: String, value: Int) {
+        val uniform = uniforms[uniformName] ?: return
+        glUniform1i(uniform, value)
     }
 
     fun createVertexShader(shaderCode: String) {
@@ -45,7 +75,6 @@ class ShaderProgram: Object() {
         return shaderId
     }
 
-    @Throws(Exception::class)
     fun link() {
         glLinkProgram(programId)
         if (glGetProgrami(programId, GL_LINK_STATUS) == 0) {
@@ -73,9 +102,7 @@ class ShaderProgram: Object() {
         glUseProgram(0)
     }
 
-    override fun dispose() {
-        super.dispose()
-
+    fun cleanup() {
         unbind()
         if (programId != 0) {
             glDeleteProgram(programId)

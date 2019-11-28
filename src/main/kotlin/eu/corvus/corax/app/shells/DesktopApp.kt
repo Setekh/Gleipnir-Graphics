@@ -30,6 +30,7 @@
 package eu.corvus.corax.app.shells
 
 import eu.corvus.corax.app.GleipnirApplication
+import eu.corvus.corax.graphics.DummyRenderer
 import eu.corvus.corax.graphics.Renderer
 import org.lwjgl.Version
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
@@ -40,6 +41,7 @@ import org.lwjgl.opengl.GL30.GL_TRUE
 import org.lwjgl.opengl.GL30.glViewport
 import org.lwjgl.system.MemoryStack.stackPush
 import org.lwjgl.system.MemoryUtil.NULL
+import org.lwjgl.system.Platform
 
 /**
  * GLFW app for desktop uses
@@ -50,9 +52,6 @@ class DesktopApp(
 ): GleipnirApplication(title) {
     // The window handle
     private var window: Long = 0
-
-    private var height = 300
-    private var width = 300
 
     init {
         println("LWJGL ${Version.getVersion()} GLFW ${glfwGetVersionString()}!")
@@ -75,9 +74,12 @@ class DesktopApp(
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE) // the window will be resizable
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3)
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2)
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE)
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3) // favor OGL3 on desktop
+
+        if (Platform.get() == Platform.MACOSX) {
+            glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE)
+            glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
+        }
 
         // Create the window
         window = glfwCreateWindow(300, 300, title, NULL, NULL)
@@ -88,13 +90,26 @@ class DesktopApp(
 
         // Setup a key callback. It will be called every time a key is pressed, repeated or released.
         glfwSetKeyCallback(window) { window, key, scancode, action, mods ->
-            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                glfwSetWindowShouldClose(window, true) // We will detect this in the rendering loop
+
+            if (action == GLFW_RELEASE) {
+                if (key == GLFW_KEY_ESCAPE)
+                    glfwSetWindowShouldClose(window, true) // We will detect this in the rendering loop
+
+                renderer as DummyRenderer
+                when (key) {
+                    GLFW_KEY_UP -> renderer.camera()?.transform?.translation?.add(0f, .5f, 0f)
+                    GLFW_KEY_DOWN -> renderer.camera()?.transform?.translation?.add(0f, -.5f, 0f)
+                    GLFW_KEY_LEFT -> renderer.camera()?.transform?.translation?.add(-.5f, 0f, 0f)
+                    GLFW_KEY_RIGHT -> renderer.camera()?.transform?.translation?.add(.5f, 0f, 0f)
+
+                    GLFW_KEY_KP_ADD -> renderer.geoms.forEach { it.worldTransform.translation.z += 0.5f }
+                    GLFW_KEY_KP_SUBTRACT -> renderer.geoms.forEach { it.worldTransform.translation.z -= 0.5f }
+                }
+            }
         }
 
         glfwSetFramebufferSizeCallback(window) { window: Long, width: Int, height: Int ->
-            this.width = width
-            this.height = height
+            resize(width, height)
         }
 
         // Get the thread stack and push a new frame
@@ -104,8 +119,9 @@ class DesktopApp(
 
             // Get the window size passed to glfwCreateWindow
             glfwGetWindowSize(window, pWidth, pHeight)
-            width = pWidth.get(0)
-            height = pHeight.get(0)
+            val width = pWidth.get(0)
+            val height = pHeight.get(0)
+            resize(width, height)
 
             // Get the resolution of the primary monitor
             val vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor())
@@ -127,6 +143,10 @@ class DesktopApp(
         glfwShowWindow(window)
     }
 
+    override fun onResize(width: Int, height: Int) {
+        renderer.onResize(width, height)
+    }
+
     override fun onReady() {
         // This line is critical for LWJGL's interoperation with GLFW's
         // OpenGL context, or any context that is managed externally.
@@ -136,14 +156,12 @@ class DesktopApp(
         GL.createCapabilities()
 
         renderer.onCreate()
+        renderer.onResize(width, height)
 
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
         while (!glfwWindowShouldClose(window)) {
-            glViewport(0, 0, width, height)
-
             renderer.onPreRender()
-
             renderer.onRender()
 
             glfwSwapBuffers(window) // swap the color buffers

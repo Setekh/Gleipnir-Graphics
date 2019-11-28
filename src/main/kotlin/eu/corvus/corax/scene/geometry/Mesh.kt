@@ -10,7 +10,7 @@ import org.lwjgl.system.MemoryUtil
 /**
  * @author Vlad Ravenholm on 11/24/2019
  *
- * @TODO set the Type { Static, Dynamic, Stream } based of scripts & other hints like controls
+ * @TODO set the Type { Static, Dynamic, Stream } based on scripts & other hints like controls
  * Should contain bound information
  *
  */
@@ -20,20 +20,6 @@ class Mesh(name: String = "Mesh"): Geometry(name) {
 
     var vertexCount: Int = 0
         private set
-
-    companion object {
-        val shader: ShaderProgram by lazy {
-            val shaderProgram = ShaderProgram()
-            shaderProgram.createVertexShader(Mesh::class.java.getResourceAsStream("/vertex.glsl").readBytes().toString(
-                Charsets.UTF_8))
-
-            shaderProgram.createFragmentShader(Mesh::class.java.getResourceAsStream("/fragment.glsl").readBytes().toString(
-                Charsets.UTF_8))
-
-            shaderProgram.link()
-            shaderProgram
-        }
-    }
 
     fun createSimple(vertexArray: FloatArray, indices: IntArray, textCoord: FloatArray = floatArrayOf(0f, 1f)): Mesh {
         vertexCount = indices.size
@@ -56,16 +42,16 @@ class Mesh(name: String = "Mesh"): Geometry(name) {
     override fun render() {
         val vao = glObject!!
 
-        shader.bind() // This should be an instruction for the renderer
         glBindVertexArray(vao.id)
 
         // Render the vertex buffer
         glEnableVertexAttribArray(0)
+        //glEnableVertexAttribArray(1)
         glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, 0)
 
         glDisableVertexAttribArray(0)
-        glBindVertexArray(0)
+        //glDisableVertexAttribArray(1)
 
-        shader.unbind()
+        glBindVertexArray(0)
     }
 }

@@ -27,45 +27,33 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.app
+package eu.corvus.corax.graphics
 
-import org.koin.core.KoinComponent
-import java.util.logging.Level
-import java.util.logging.Logger
+import eu.corvus.corax.scene.Camera
+import org.joml.Quaternionf
+import org.joml.Vector3f
+import sun.awt.windows.ThemeReader.getPosition
+import org.joml.Matrix4f
+
+
 
 /**
- * @author Vlad Ravenholm on 11/24/2019
+ * @author Vlad Ravenholm on 11/28/2019
  */
-abstract class GleipnirApplication(val title: String): KoinComponent {
-    var width: Int = 300
-        private set
-    var height: Int = 300
-        private set
-
-    fun resize(width: Int, height: Int) {
-        this.width = width
-        this.height = height
-
-        onResize(width, height)
+open class Transform {
+    companion object {
+        @JvmStatic
+        val Identity = Transform()
     }
 
-    open fun onResize(width: Int, height: Int) {}
+    val translation = Vector3f(0f, 0f, 0f)
+    val rotation = Quaternionf().identity()
+    val scale = Vector3f(1f, 1f, 1f)
 
-    abstract fun onCreate()
-
-    open fun onReady() {}
-
-    abstract fun onDestroy()
-
-    fun startLifeCycle() {
-        onCreate()
-        try {
-            onReady()
-        } catch (e: Exception) {
-            Logger.getLogger(javaClass.name).log(Level.INFO, "Fatal crash!", e)
-        } finally {
-            onDestroy()
-        }
+    fun identity(): Transform {
+        translation.set(Identity.translation)
+        rotation.set(Identity.rotation)
+        scale.set(Identity.scale)
+        return this
     }
-
 }
