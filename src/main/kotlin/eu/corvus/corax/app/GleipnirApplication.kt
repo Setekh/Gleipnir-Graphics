@@ -37,6 +37,20 @@ import java.util.logging.Logger
  * @author Vlad Ravenholm on 11/24/2019
  */
 abstract class GleipnirApplication(val title: String): KoinComponent {
+    var width: Int = 300
+        private set
+    var height: Int = 300
+        private set
+
+    fun resize(width: Int, height: Int) {
+        this.width = width
+        this.height = height
+
+        onResize(width, height)
+    }
+
+    open fun onResize(width: Int, height: Int) {}
+
     abstract fun onCreate()
 
     open fun onReady() {}
@@ -53,4 +67,5 @@ abstract class GleipnirApplication(val title: String): KoinComponent {
             onDestroy()
         }
     }
+
 }

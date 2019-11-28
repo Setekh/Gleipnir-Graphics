@@ -29,14 +29,22 @@
  */
 package eu.corvus.corax.graphics
 
+import eu.corvus.corax.app.GleipnirApplication
 import eu.corvus.corax.scene.geometry.Geometry
 import eu.corvus.corax.scene.geometry.Mesh
+import org.koin.core.KoinComponent
+import org.koin.core.inject
+import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL30.*
 
 /**
  * @author Vlad Ravenholm on 11/24/2019
  */
 class DummyRenderer : Renderer {
+
+    private var width: Int = 300
+    private var height: Int = 300
+
     private val geoms = arrayListOf<Geometry>()
 
     override fun onCreate() {
@@ -57,6 +65,11 @@ class DummyRenderer : Renderer {
         glClearColor(0.13f, 0.13f, 0.13f, 0.13f)
     }
 
+    override fun onResize(width: Int, height: Int) {
+        this.width = width
+        this.height = height
+    }
+
     override fun onPreRender() {
         val removedSome = geoms.removeAll { it !is Mesh || it.glObject == null }
 
@@ -65,6 +78,7 @@ class DummyRenderer : Renderer {
     }
 
     override fun onRender() {
+        glViewport(0, 0, width, height)
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
         geoms.forEach {

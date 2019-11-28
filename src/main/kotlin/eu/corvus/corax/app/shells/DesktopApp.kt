@@ -40,6 +40,7 @@ import org.lwjgl.opengl.GL30.GL_TRUE
 import org.lwjgl.opengl.GL30.glViewport
 import org.lwjgl.system.MemoryStack.stackPush
 import org.lwjgl.system.MemoryUtil.NULL
+import org.lwjgl.system.Platform
 
 /**
  * GLFW app for desktop uses
@@ -50,9 +51,6 @@ class DesktopApp(
 ): GleipnirApplication(title) {
     // The window handle
     private var window: Long = 0
-
-    private var height = 300
-    private var width = 300
 
     init {
         println("LWJGL ${Version.getVersion()} GLFW ${glfwGetVersionString()}!")
@@ -75,9 +73,12 @@ class DesktopApp(
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE) // the window will be resizable
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3)
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2)
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE)
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3) // favor OGL3 on desktop
+
+        if (Platform.get() == Platform.MACOSX) {
+            glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE)
+            glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
+        }
 
         // Create the window
         window = glfwCreateWindow(300, 300, title, NULL, NULL)
@@ -93,8 +94,7 @@ class DesktopApp(
         }
 
         glfwSetFramebufferSizeCallback(window) { window: Long, width: Int, height: Int ->
-            this.width = width
-            this.height = height
+            resize(width, height)
         }
 
         // Get the thread stack and push a new frame
@@ -104,8 +104,9 @@ class DesktopApp(
 
             // Get the window size passed to glfwCreateWindow
             glfwGetWindowSize(window, pWidth, pHeight)
-            width = pWidth.get(0)
-            height = pHeight.get(0)
+            val width = pWidth.get(0)
+            val height = pHeight.get(0)
+            resize(width, height)
 
             // Get the resolution of the primary monitor
             val vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor())
@@ -127,6 +128,10 @@ class DesktopApp(
         glfwShowWindow(window)
     }
 
+    override fun onResize(width: Int, height: Int) {
+        renderer.onResize(width, height)
+    }
+
     override fun onReady() {
         // This line is critical for LWJGL's interoperation with GLFW's
         // OpenGL context, or any context that is managed externally.
@@ -136,14 +141,12 @@ class DesktopApp(
         GL.createCapabilities()
 
         renderer.onCreate()
+        renderer.onResize(width, height)
 
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
         while (!glfwWindowShouldClose(window)) {
-            glViewport(0, 0, width, height)
-
             renderer.onPreRender()
-
             renderer.onRender()
 
             glfwSwapBuffers(window) // swap the color buffers
