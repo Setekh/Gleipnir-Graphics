@@ -1,19 +1,22 @@
 package eu.corvus.corax.scene
 
 import org.joml.Matrix4f
-import org.joml.Matrix4fc
-import org.joml.Vector3f
 
-open class Camera {
-    val projectionMatrix : Matrix4fc = Matrix4f()
+open class Camera(name: String = "Camera") : Spatial(name) {
+    val viewMatrix = Matrix4f()
+    val projectionMatrix = Matrix4f()
+    val viewProjectionMatrix = Matrix4f()
 
-    private val mProjectionMatrix = projectionMatrix as Matrix4f
-
-    fun useAsProjection(fov: Float, aspectRatio: Float, near: Float = 0.01f, far: Float = 300f) {
-        mProjectionMatrix.perspective(fov, aspectRatio, near, far)
+    fun useAsProjection(fov: Double, aspectRatio: Float, near: Float = 0.01f, far: Float = 300f) {
+        projectionMatrix.identity().perspective(fov.toFloat(), aspectRatio, near, far)
     }
 
-    fun setLocation(location: Vector3f) {
-        mProjectionMatrix.translate(location)
+    fun computeMatrices() {
+        val cameraPos = transform.translation
+        val rotation = transform.rotation
+
+        viewMatrix.identity().rotate(rotation).translate(-cameraPos.x, -cameraPos.y, -cameraPos.z)
+
+        viewProjectionMatrix.set(projectionMatrix).mul(viewMatrix)
     }
 }
