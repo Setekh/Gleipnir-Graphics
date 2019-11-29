@@ -48,10 +48,6 @@ class DummyRenderer : Renderer {
 
     private val worldMatrix = Matrix4f()
 
-    override fun camera(): Camera? {
-        return camera
-    }
-
     val shader: ShaderProgram by lazy {
         val shaderProgram = ShaderProgram()
         shaderProgram.createVertexShader(Mesh::class.java.getResourceAsStream("/vertex.glsl").readBytes().toString(
@@ -75,7 +71,7 @@ class DummyRenderer : Renderer {
 
         val indeces = intArrayOf(0, 1, 3, 3, 1, 2)
 
-        geoms.add(Mesh("Quad").createSimple(vertices, indeces).apply { worldTransform.translation.z = -2f })
+        geoms.add(Mesh("Quad").createSimple(vertices, indeces).apply { transform.translation.z = -2f })
 
 
         glEnable(GL_DEPTH_TEST)
@@ -100,6 +96,7 @@ class DummyRenderer : Renderer {
         if (removedSome)
             println("Removed some dangling geometries!")
 
+        geoms.forEach { it.update(0f) }
         camera.computeMatrices()
     }
 
@@ -110,7 +107,7 @@ class DummyRenderer : Renderer {
         shader.bind() // This should be an instruction for the renderer
 
         geoms.forEach {
-            shader.setUniform("worldViewProjectionMatrix", worldMatrix.set(camera.viewProjectionMatrix).mul(it.getWorldMatrix()))
+            shader.setUniform("worldViewProjectionMatrix", worldMatrix.set(camera.viewProjectionMatrix).mul(it.worldMatrix))
             it.render()
         }
 
