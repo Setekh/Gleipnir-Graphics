@@ -27,64 +27,35 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.app
-
-import eu.corvus.corax.app.timers.Timer
-import org.koin.core.KoinComponent
-import java.util.logging.Level
-import java.util.logging.Logger
+package eu.corvus.corax.app.timers
 
 /**
- * @author Vlad Ravenholm on 11/24/2019
+ * @author Vlad Ravenholm on 11/30/2019
  */
-abstract class GleipnirApplication(
-    val title: String,
-    var timer: Timer
-): KoinComponent {
-    var width: Int = 300
+abstract class Timer {
+    var framePerSecond: Int = 0
+        protected set
+
+    var timePerFrame: Float = 0f
+        protected set
+
+    /**
+     * Current time in ticks
+     */
+    abstract fun getTime(): Long
+
+    /**
+     * Current time in seconds
+     */
+    var timeInSeconds: Float = 0f
+        get() = getTime() / inverseResolution.toFloat()
         private set
-    var height: Int = 300
-        private set
 
-    var speed = 1f
-    var paused = false
+    /**
+     * Number of timer ticks per second
+     */
+    abstract val resolution: Long
+    abstract val inverseResolution: Long
 
-    fun resize(width: Int, height: Int) {
-        this.width = width
-        this.height = height
-
-        onResize(width, height)
-    }
-
-    open fun onResize(width: Int, height: Int) {}
-
-    abstract fun onCreate()
-
-    open fun onReady() {}
-
-    fun update() {
-        if(speed == 0f || paused)
-            return
-
-        timer.tick()
-
-        val tpf = timer.timePerFrame * speed
-        onUpdate(tpf)
-    }
-
-    open fun onUpdate(tpf: Float)  = Unit
-
-    abstract fun onDestroy()
-
-    fun startLifeCycle() {
-        onCreate()
-        try {
-            onReady()
-        } catch (e: Exception) {
-            Logger.getLogger(javaClass.name).log(Level.INFO, "Fatal crash!", e)
-        } finally {
-            onDestroy()
-        }
-    }
-
+    abstract fun tick()
 }

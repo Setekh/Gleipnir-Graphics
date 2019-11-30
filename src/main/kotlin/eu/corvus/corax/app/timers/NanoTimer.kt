@@ -27,64 +27,32 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.app
+package eu.corvus.corax.app.timers
 
-import eu.corvus.corax.app.timers.Timer
-import org.koin.core.KoinComponent
-import java.util.logging.Level
-import java.util.logging.Logger
-
-/**
- * @author Vlad Ravenholm on 11/24/2019
- */
-abstract class GleipnirApplication(
-    val title: String,
-    var timer: Timer
-): KoinComponent {
-    var width: Int = 300
-        private set
-    var height: Int = 300
-        private set
-
-    var speed = 1f
-    var paused = false
-
-    fun resize(width: Int, height: Int) {
-        this.width = width
-        this.height = height
-
-        onResize(width, height)
+class NanoTimer: Timer() {
+    companion object {
+        const val Resolution = 1000000000L
+        const val InverseResolution = (1f / Resolution).toLong()
     }
 
-    open fun onResize(width: Int, height: Int) {}
+    private var startTime: Long = 0
+    private var previousTime: Long = 0
 
-    abstract fun onCreate()
+    override fun getTime(): Long = System.nanoTime() - startTime
 
-    open fun onReady() {}
+    override val resolution: Long
+        get() = Resolution
 
-    fun update() {
-        if(speed == 0f || paused)
-            return
+    override val inverseResolution: Long
+        get() = InverseResolution
 
-        timer.tick()
-
-        val tpf = timer.timePerFrame * speed
-        onUpdate(tpf)
+    init {
+        startTime = System.nanoTime()
     }
 
-    open fun onUpdate(tpf: Float)  = Unit
-
-    abstract fun onDestroy()
-
-    fun startLifeCycle() {
-        onCreate()
-        try {
-            onReady()
-        } catch (e: Exception) {
-            Logger.getLogger(javaClass.name).log(Level.INFO, "Fatal crash!", e)
-        } finally {
-            onDestroy()
-        }
+    override fun tick() {
+        timePerFrame = (getTime() - previousTime) * (1.0f / Resolution)
+        framePerSecond = (1.0f / timePerFrame).toInt()
+        previousTime = getTime()
     }
-
 }
