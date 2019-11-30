@@ -62,17 +62,27 @@ class DummyRenderer : Renderer {
 
     override fun onCreate() {
         val vertices = floatArrayOf(
-            -0.5f,  0.5f, -1.05f,
-            -0.5f, -0.5f, -1.05f,
-            0.5f, -0.5f, -1.05f,
-            0.5f,  0.5f, -1.05f
+            -0.5f,  0.5f, 0f,
+            -0.5f, -0.5f, 0f,
+            0.5f, -0.5f, 0f,
+            0.5f,  0.5f, 0f
         )
 
 
         val indeces = intArrayOf(0, 1, 3, 3, 1, 2)
 
-        geoms.add(Mesh("Quad").createSimple(vertices, indeces).apply { transform.translation.z = -2f })
+        geoms.add(Mesh("Quad").createSimple(vertices, indeces).apply {
+            transform.translation.z = -2f
 
+            appendChild(Mesh("Quad-2").createSimple(vertices, indeces).also { it ->
+                geoms.add(it)
+                it.transform.translation.x = -1.2f
+                it.transform.translation.z = -1.2f
+            })
+
+        })
+
+        geoms.reverse()
 
         glEnable(GL_DEPTH_TEST)
         // Set the clear color
@@ -90,7 +100,6 @@ class DummyRenderer : Renderer {
     }
 
     override fun onPreRender() {
-
         val removedSome = geoms.removeAll { it !is Mesh || it.glObject == null }
 
         if (removedSome)

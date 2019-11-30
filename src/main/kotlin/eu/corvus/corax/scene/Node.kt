@@ -1,8 +1,5 @@
 package eu.corvus.corax.scene
 
-import eu.corvus.corax.scene.geometry.Geometry
-import eu.corvus.corax.scene.geometry.Mesh
-
 /**
  * This class:
  *  - is not rendable or spatial
@@ -15,11 +12,15 @@ open class Node(var name: String = "Node"): Object() {
     val children: List<Node> = mutableListOf()
     private val mChildren = children as MutableList
 
-    fun addChild(child: Node) {
+    var parent: Node? = null
+
+    open fun appendChild(child: Node) {
         mChildren.add(child)
+        child.parent = this
     }
 
-    fun removeChild(child: Node) {
+    open fun removeChild(child: Node) {
         mChildren.remove(child)
+        child.parent = null
     }
 }

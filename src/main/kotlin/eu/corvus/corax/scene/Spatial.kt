@@ -25,17 +25,32 @@ open class Spatial(name: String = "Spatial") : Node(name) {
     private var shouldCompute = true
 
     private fun computeWorldTransform() {
-        //TODO get parent and compute with parent
+        val parent = this.parent
+        worldTransform.set(transform)
+
+        if (parent is Spatial) { // For each child, set the update flag to shouldUpdate = true
+            worldTransform.mergeParentTransform(parent.worldTransform)
+        }
 
         worldMatrix.identity()
-            .translate(transform.translation)
-            .rotate(transform.rotation)
-            .scale(transform.scale)
+            .translate(worldTransform.translation)
+            .rotate(worldTransform.rotation)
+            .scale(worldTransform.scale)
 
         shouldCompute = false
     }
 
     open fun onUpdate(tpf: Float): Boolean = false
+
+    override fun appendChild(child: Node) {
+        super.appendChild(child)
+        shouldCompute = true
+    }
+
+    override fun removeChild(child: Node) {
+        super.removeChild(child)
+        shouldCompute = true
+    }
 
     fun update(tpf: Float) {
         val shouldUpdate = onUpdate(tpf)
