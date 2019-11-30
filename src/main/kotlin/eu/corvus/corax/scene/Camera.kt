@@ -15,7 +15,7 @@ open class Camera(name: String = "Camera") : Spatial(name) {
         val cameraPos = transform.translation
         val rotation = transform.rotation
 
-        viewMatrix.identity().rotate(rotation).translate(-cameraPos.x, -cameraPos.y, -cameraPos.z)
+        viewMatrix.identity().rotate(rotation).translate(cameraPos)
 
         viewProjectionMatrix.set(projectionMatrix).mul(viewMatrix)
     }

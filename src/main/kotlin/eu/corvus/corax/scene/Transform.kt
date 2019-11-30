@@ -32,7 +32,6 @@ package eu.corvus.corax.scene
 import org.joml.Quaternionf
 import org.joml.Vector3f
 
-
 /**
  * @author Vlad Ravenholm on 11/28/2019
  */
@@ -62,26 +61,13 @@ open class Transform {
 
     fun mergeParentTransform(parentTransform: Transform) {
         scale.mul(parentTransform.scale)
+
         parentTransform.rotation.mul(rotation, rotation)
+
         translation.mul(parentTransform.scale)
 
-        //parentTransform.translation.rotate(parentTransform.rotation, translation).add(parentTransform.translation)
-        //parentTransform.rotation.transform(parentTransform.translation, translation).add(parentTransform.translation)
-        parentTransform.rotation.mult(translation).add(parentTransform.translation)
+        val parentTrans = parentTransform.translation
+        parentTransform.rotation.transform(translation)
+        translation.add(parentTrans)
     }
-}
-
-fun Quaternionf.mult(v: Vector3f): Vector3f {
-    val tempX: Float =
-        w * w * v.x + 2 * y * w * v.z - 2 * z * w * v.y + x * x * v.x
-        + 2 * y * x * v.y + 2 * z * x * v.z - z * z * v.x - y * y * v.x
-
-    val tempY: Float =
-        2 * x * y * v.x + y * y * v.y + 2 * z * y * v.z + 2 * w * z *
-                v.x - z * z * v.y + w * w * v.y - 2 * x * w * v.z - x * x * v.y
-    v.z =
-        2 * x * z * v.x + 2 * y * z * v.y + z * z * v.z - 2 * w * y * v.x - y * y * v.z + 2 * w * x * v.y - x * x * v.z + w * w * v.z
-    v.x = tempX
-    v.y = tempY
-    return v
 }

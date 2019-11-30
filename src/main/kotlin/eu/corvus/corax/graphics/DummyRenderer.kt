@@ -33,6 +33,7 @@ import eu.corvus.corax.scene.Camera
 import eu.corvus.corax.scene.geometry.Geometry
 import eu.corvus.corax.scene.geometry.Mesh
 import org.joml.Math
+import org.joml.Math.toRadians
 import org.joml.Matrix4f
 import org.lwjgl.opengl.GL30.*
 
@@ -68,18 +69,21 @@ class DummyRenderer : Renderer {
             0.5f,  0.5f, 0f
         )
 
-
         val indeces = intArrayOf(0, 1, 3, 3, 1, 2)
 
+        camera.transform.rotation.rotateX(toRadians(-90.0).toFloat())
+        camera.transform.translation.set(0f, 3f, 0f)
+
         geoms.add(Mesh("Quad").createSimple(vertices, indeces).apply {
-            transform.translation.z = -2f
+            transform.rotation.rotationY(Math.toRadians(60.0).toFloat())
+            transform.rotation.rotateX(Math.toRadians(-90.0).toFloat())
 
             appendChild(Mesh("Quad-2").createSimple(vertices, indeces).also { it ->
                 geoms.add(it)
                 it.transform.translation.x = -1.2f
-                it.transform.translation.z = -1.2f
+                //it.transform.translation.z = -1.2f
+                //it.transform.rotation.rotationX(java.lang.Math.toRadians(40.0).toFloat())
             })
-
         })
 
         geoms.reverse()
@@ -96,7 +100,7 @@ class DummyRenderer : Renderer {
         this.height = height
 
         val aspectRatio = width.toFloat() / height.toFloat()
-        camera.useAsProjection(Math.toRadians(60.0), aspectRatio)
+        camera.useAsProjection(toRadians(70.0), aspectRatio)
     }
 
     override fun onPreRender() {
@@ -105,7 +109,9 @@ class DummyRenderer : Renderer {
         if (removedSome)
             println("Removed some dangling geometries!")
 
-        geoms.forEach { it.update(0f) }
+        geoms.forEach {
+            it.update(0f)
+        }
         camera.computeMatrices()
     }
 
