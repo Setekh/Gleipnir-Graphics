@@ -81,8 +81,6 @@ class DummyRenderer : Renderer {
             appendChild(Mesh("Quad-2").createSimple(vertices, indeces).also { it ->
                 geoms.add(it)
                 it.transform.translation.x = -1.2f
-                //it.transform.translation.z = -1.2f
-                //it.transform.rotation.rotationX(java.lang.Math.toRadians(40.0).toFloat())
             })
         })
 
@@ -103,14 +101,14 @@ class DummyRenderer : Renderer {
         camera.useAsProjection(toRadians(70.0), aspectRatio)
     }
 
-    override fun onPreRender() {
+    override fun onPreRender(tpf: Float) {
         val removedSome = geoms.removeAll { it !is Mesh || it.glObject == null }
 
         if (removedSome)
             println("Removed some dangling geometries!")
 
         geoms.forEach {
-            it.update(0f)
+            it.update(tpf)
         }
         camera.computeMatrices()
     }

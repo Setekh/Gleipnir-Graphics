@@ -6,7 +6,7 @@ package eu.corvus.corax.graphics
 interface Renderer {
     fun onCreate()
 
-    fun onPreRender()
+    fun onPreRender(tpf: Float)
     fun onRender()
     fun onDestroy()
 

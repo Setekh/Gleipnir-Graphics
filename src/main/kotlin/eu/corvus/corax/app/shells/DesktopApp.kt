@@ -31,6 +31,7 @@ package eu.corvus.corax.app.shells
 
 import eu.corvus.corax.app.GleipnirApplication
 import eu.corvus.corax.graphics.Renderer
+import eu.corvus.corax.app.timers.Timer
 import org.lwjgl.Version
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW.*
@@ -46,8 +47,9 @@ import org.lwjgl.system.Platform
  */
 class DesktopApp(
     title: String = "App Window",
+    timer: Timer,
     private val renderer: Renderer
-): GleipnirApplication(title) {
+    ): GleipnirApplication(title, timer) {
     // The window handle
     private var window: Long = 0
 
@@ -78,6 +80,9 @@ class DesktopApp(
             glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE)
             glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
         }
+
+        // Samples
+        //glfwWindowHint(GLFW_SAMPLES, 16)
 
         // Create the window
         window = glfwCreateWindow(300, 300, title, NULL, NULL)
@@ -139,14 +144,16 @@ class DesktopApp(
         // bindings available for use.
         GL.createCapabilities()
 
+        //glEnable(GL_MULTISAMPLE)
+
         renderer.onCreate()
         renderer.onResize(width, height)
 
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
         while (!glfwWindowShouldClose(window)) {
-            renderer.onPreRender()
-            renderer.onRender()
+
+            update()
 
             glfwSwapBuffers(window) // swap the color buffers
 
@@ -154,6 +161,11 @@ class DesktopApp(
             // invoked during this call.
             glfwPollEvents()
         }
+    }
+
+    override fun onUpdate(tpf: Float) {
+        renderer.onPreRender(tpf)
+        renderer.onRender()
     }
 
     override fun onDestroy() {
