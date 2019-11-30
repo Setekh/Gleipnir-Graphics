@@ -24,6 +24,11 @@ open class Spatial(name: String = "Spatial") : Node(name) {
 
     private var shouldCompute = true
 
+    fun forceUpdate() {
+        children.forEach { (it as? Spatial)?.forceUpdate() }
+        shouldCompute = true
+    }
+
     private fun computeWorldTransform() {
         val parent = this.parent
         worldTransform.set(transform)

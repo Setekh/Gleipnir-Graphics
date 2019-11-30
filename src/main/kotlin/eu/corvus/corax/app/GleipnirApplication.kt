@@ -29,7 +29,6 @@
  */
 package eu.corvus.corax.app
 
-import eu.corvus.corax.app.timers.Timer
 import org.koin.core.KoinComponent
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -41,9 +40,9 @@ abstract class GleipnirApplication(
     val title: String,
     var timer: Timer
 ): KoinComponent {
-    var width: Int = 300
+    var width: Int = 640
         private set
-    var height: Int = 300
+    var height: Int = 480
         private set
 
     var speed = 1f

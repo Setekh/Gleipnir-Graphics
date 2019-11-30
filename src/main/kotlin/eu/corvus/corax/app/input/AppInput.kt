@@ -27,34 +27,41 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.app.timers
+package eu.corvus.corax.app.input
 
-import eu.corvus.corax.app.Timer
+import eu.corvus.corax.app.Device
+import eu.corvus.corax.app.Input
+import eu.corvus.corax.app.InputAction
+import eu.corvus.corax.app.KeyEvent
 
-class NanoTimer: Timer() {
-    companion object {
-        const val Resolution = 1000000000L
-        const val InverseResolution = (1f / Resolution).toLong()
+/**
+ * @author Vlad Ravenholm on 11/30/2019
+ */
+class AppInput: Input {
+    private val actions: MutableMap<String, InputAction> = mutableMapOf()
+    private val keyMap: MutableMap<Int, String> = mutableMapOf()
+
+    override fun keyPress(key: Int, event: KeyEvent) {
+        if (event == KeyEvent.Repeat) return // not finding an use right now
+
+        val mapping = keyMap[key] ?: return let { System.err.println("No mapping for key $key") }
+        actions[mapping]?.invoke(mapping, event) ?: let { System.err.println("How did we get here? null mapping! $mapping") }
     }
 
-    private var startTime: Long = 0
-    private var previousTime: Long = 0
-
-    override fun getTime(): Long = System.nanoTime() - startTime
-
-    override val resolution: Long
-        get() = Resolution
-
-    override val inverseResolution: Long
-        get() = InverseResolution
-
-    init {
-        startTime = System.nanoTime()
+    override fun map(device: Device, target: Int, mapping: String, action: InputAction) {
+        when (device) {
+            Device.Keyboard -> {
+                keyMap[target] = mapping
+                actions[mapping] = action
+            }
+            Device.Mouse -> TODO()
+            Device.Controller -> TODO()
+        }
     }
 
-    override fun tick() {
-        timePerFrame = (getTime() - previousTime) * (1.0f / Resolution)
-        framePerSecond = (1.0f / timePerFrame).toInt()
-        previousTime = getTime()
+    override fun remove(mapping: String) {
+        val key = keyMap.entries.find { it.value == mapping }?.key
+        keyMap.remove(key)
+        actions.remove(mapping)
     }
 }
