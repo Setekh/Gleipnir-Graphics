@@ -30,8 +30,10 @@
 package eu.corvus.corax.app.shells
 
 import eu.corvus.corax.app.GleipnirApplication
+import eu.corvus.corax.app.Input
+import eu.corvus.corax.app.KeyEvent
 import eu.corvus.corax.graphics.Renderer
-import eu.corvus.corax.app.timers.Timer
+import eu.corvus.corax.app.Timer
 import org.lwjgl.Version
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW.*
@@ -48,6 +50,7 @@ import org.lwjgl.system.Platform
 class DesktopApp(
     title: String = "App Window",
     timer: Timer,
+    private val input: Input,
     private val renderer: Renderer
     ): GleipnirApplication(title, timer) {
     // The window handle
@@ -85,7 +88,7 @@ class DesktopApp(
         //glfwWindowHint(GLFW_SAMPLES, 16)
 
         // Create the window
-        window = glfwCreateWindow(300, 300, title, NULL, NULL)
+        window = glfwCreateWindow(width, height, title, NULL, NULL)
         if (window == NULL)
             throw RuntimeException("Failed to create the GLFW window")
 
@@ -95,6 +98,14 @@ class DesktopApp(
         glfwSetKeyCallback(window) { window, key, scancode, action, mods ->
             if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
                 glfwSetWindowShouldClose(window, true) // We will detect this in the rendering loop
+
+            //println("window = [${window}], key = [${key}], scancode = [${scancode}], action = [${action}], mods = [${mods}]")
+            input.keyPress(key, when(action) {
+                GLFW_PRESS -> KeyEvent.Pressed
+                GLFW_RELEASE -> KeyEvent.Released
+                GLFW_REPEAT -> KeyEvent.Repeat
+                else -> error("Unk action! $action")
+            })
         }
 
         glfwSetFramebufferSizeCallback(window) { window: Long, width: Int, height: Int ->

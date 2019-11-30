@@ -27,35 +27,23 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.app.timers
+package eu.corvus.corax.app
 
 /**
  * @author Vlad Ravenholm on 11/30/2019
  */
-abstract class Timer {
-    var framePerSecond: Int = 0
-        protected set
-
-    var timePerFrame: Float = 0f
-        protected set
+interface Input {
+    fun map(device: Device, target: Int, mapping: String, action: InputAction)
+    fun remove(mapping: String)
 
     /**
-     * Current time in ticks
+     * Usually available on desktop, so no need to map keys to anything else
      */
-    abstract fun getTime(): Long
+    fun keyPress(key: Int, event: KeyEvent)
 
-    /**
-     * Current time in seconds
-     */
-    var timeInSeconds: Float = 0f
-        get() = getTime() / inverseResolution.toFloat()
-        private set
-
-    /**
-     * Number of timer ticks per second
-     */
-    abstract val resolution: Long
-    abstract val inverseResolution: Long
-
-    abstract fun tick()
 }
+
+enum class KeyEvent { Pressed, Released, Repeat }
+
+enum class Device { Keyboard, Mouse, Controller }
+typealias InputAction = (mapping: String, status: KeyEvent) -> Unit

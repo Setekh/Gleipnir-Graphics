@@ -29,18 +29,24 @@
  */
 package eu.corvus.corax.graphics
 
+import eu.corvus.corax.app.Device
+import eu.corvus.corax.app.Input
+import eu.corvus.corax.app.KeyEvent
 import eu.corvus.corax.scene.Camera
 import eu.corvus.corax.scene.geometry.Geometry
 import eu.corvus.corax.scene.geometry.Mesh
 import org.joml.Math
 import org.joml.Math.toRadians
 import org.joml.Matrix4f
+import org.lwjgl.glfw.GLFW
 import org.lwjgl.opengl.GL30.*
 
 /**
  * @author Vlad Ravenholm on 11/24/2019
  */
-class DummyRenderer : Renderer {
+class DummyRenderer(
+    private val input: Input
+) : Renderer {
     private var width: Int = 300
     private var height: Int = 300
 
@@ -51,11 +57,17 @@ class DummyRenderer : Renderer {
 
     val shader: ShaderProgram by lazy {
         val shaderProgram = ShaderProgram()
-        shaderProgram.createVertexShader(Mesh::class.java.getResourceAsStream("/vertex.glsl").readBytes().toString(
-            Charsets.UTF_8))
+        shaderProgram.createVertexShader(
+            Mesh::class.java.getResourceAsStream("/vertex.glsl").readBytes().toString(
+                Charsets.UTF_8
+            )
+        )
 
-        shaderProgram.createFragmentShader(Mesh::class.java.getResourceAsStream("/fragment.glsl").readBytes().toString(
-            Charsets.UTF_8))
+        shaderProgram.createFragmentShader(
+            Mesh::class.java.getResourceAsStream("/fragment.glsl").readBytes().toString(
+                Charsets.UTF_8
+            )
+        )
 
         shaderProgram.link()
         shaderProgram
@@ -63,10 +75,10 @@ class DummyRenderer : Renderer {
 
     override fun onCreate() {
         val vertices = floatArrayOf(
-            -0.5f,  0.5f, 0f,
+            -0.5f, 0.5f, 0f,
             -0.5f, -0.5f, 0f,
             0.5f, -0.5f, 0f,
-            0.5f,  0.5f, 0f
+            0.5f, 0.5f, 0f
         )
 
         val indeces = intArrayOf(0, 1, 3, 3, 1, 2)
@@ -74,7 +86,9 @@ class DummyRenderer : Renderer {
         camera.transform.rotation.rotateX(toRadians(-90.0).toFloat())
         camera.transform.translation.set(0f, 3f, 0f)
 
+        val mesh: Mesh
         geoms.add(Mesh("Quad").createSimple(vertices, indeces).apply {
+            mesh = this
             transform.rotation.rotationY(Math.toRadians(60.0).toFloat())
             transform.rotation.rotateX(Math.toRadians(-90.0).toFloat())
 
@@ -91,6 +105,20 @@ class DummyRenderer : Renderer {
         glClearColor(0.13f, 0.13f, 0.13f, 0.13f)
 
         shader.createUniform("worldViewProjectionMatrix")
+
+        input.map(Device.Keyboard, GLFW.GLFW_KEY_LEFT, "rotate-") { _, status ->
+            if (status == KeyEvent.Released) {
+                mesh.transform.rotation.rotateZ(toRadians(-10.0).toFloat())
+                mesh.forceUpdate()
+            }
+        }
+
+        input.map(Device.Keyboard, GLFW.GLFW_KEY_RIGHT, "rotate+") { _, status ->
+            if (status == KeyEvent.Released) {
+                mesh.transform.rotation.rotateZ(toRadians(10.0).toFloat())
+                mesh.forceUpdate()
+            }
+        }
     }
 
     override fun onResize(width: Int, height: Int) {
@@ -120,7 +148,10 @@ class DummyRenderer : Renderer {
         shader.bind() // This should be an instruction for the renderer
 
         geoms.forEach {
-            shader.setUniform("worldViewProjectionMatrix", worldMatrix.set(camera.viewProjectionMatrix).mul(it.worldMatrix))
+            shader.setUniform(
+                "worldViewProjectionMatrix",
+                worldMatrix.set(camera.viewProjectionMatrix).mul(it.worldMatrix)
+            )
             it.render()
         }
 
@@ -130,5 +161,4 @@ class DummyRenderer : Renderer {
     override fun onDestroy() {
         geoms.filterIsInstance<Mesh>().forEach { it.glObject?.free() }
     }
-
 }

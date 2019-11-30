@@ -37,6 +37,6 @@ import org.koin.dsl.module
 
 val graphicsModule = module {
     single<Renderer> {
-        DummyRenderer()
+        DummyRenderer(get())
     }
 }

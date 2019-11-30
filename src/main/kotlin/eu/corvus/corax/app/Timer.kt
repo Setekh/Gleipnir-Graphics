@@ -27,34 +27,35 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.app.timers
+package eu.corvus.corax.app
 
-import eu.corvus.corax.app.Timer
+/**
+ * @author Vlad Ravenholm on 11/30/2019
+ */
+abstract class Timer {
+    var framePerSecond: Int = 0
+        protected set
 
-class NanoTimer: Timer() {
-    companion object {
-        const val Resolution = 1000000000L
-        const val InverseResolution = (1f / Resolution).toLong()
-    }
+    var timePerFrame: Float = 0f
+        protected set
 
-    private var startTime: Long = 0
-    private var previousTime: Long = 0
+    /**
+     * Current time in ticks
+     */
+    abstract fun getTime(): Long
 
-    override fun getTime(): Long = System.nanoTime() - startTime
+    /**
+     * Current time in seconds
+     */
+    var timeInSeconds: Float = 0f
+        get() = getTime() / inverseResolution.toFloat()
+        private set
 
-    override val resolution: Long
-        get() = Resolution
+    /**
+     * Number of timer ticks per second
+     */
+    abstract val resolution: Long
+    abstract val inverseResolution: Long
 
-    override val inverseResolution: Long
-        get() = InverseResolution
-
-    init {
-        startTime = System.nanoTime()
-    }
-
-    override fun tick() {
-        timePerFrame = (getTime() - previousTime) * (1.0f / Resolution)
-        framePerSecond = (1.0f / timePerFrame).toInt()
-        previousTime = getTime()
-    }
+    abstract fun tick()
 }
