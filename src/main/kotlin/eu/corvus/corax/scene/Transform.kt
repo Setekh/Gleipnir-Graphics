@@ -27,15 +27,10 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.graphics
+package eu.corvus.corax.scene
 
-import eu.corvus.corax.scene.Camera
 import org.joml.Quaternionf
 import org.joml.Vector3f
-import sun.awt.windows.ThemeReader.getPosition
-import org.joml.Matrix4f
-
-
 
 /**
  * @author Vlad Ravenholm on 11/28/2019
@@ -55,5 +50,24 @@ open class Transform {
         rotation.set(Identity.rotation)
         scale.set(Identity.scale)
         return this
+    }
+
+    fun set(transform: Transform): Transform {
+        translation.set(transform.translation)
+        rotation.set(transform.rotation)
+        scale.set(transform.scale)
+        return this
+    }
+
+    fun mergeParentTransform(parentTransform: Transform) {
+        scale.mul(parentTransform.scale)
+
+        parentTransform.rotation.mul(rotation, rotation)
+
+        translation.mul(parentTransform.scale)
+
+        val parentTrans = parentTransform.translation
+        parentTransform.rotation.transform(translation)
+        translation.add(parentTrans)
     }
 }

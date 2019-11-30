@@ -30,7 +30,6 @@
 package eu.corvus.corax.app.shells
 
 import eu.corvus.corax.app.GleipnirApplication
-import eu.corvus.corax.graphics.DummyRenderer
 import eu.corvus.corax.graphics.Renderer
 import org.lwjgl.Version
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
@@ -38,7 +37,6 @@ import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL30.GL_TRUE
-import org.lwjgl.opengl.GL30.glViewport
 import org.lwjgl.system.MemoryStack.stackPush
 import org.lwjgl.system.MemoryUtil.NULL
 import org.lwjgl.system.Platform
@@ -90,22 +88,8 @@ class DesktopApp(
 
         // Setup a key callback. It will be called every time a key is pressed, repeated or released.
         glfwSetKeyCallback(window) { window, key, scancode, action, mods ->
-
-            if (action == GLFW_RELEASE) {
-                if (key == GLFW_KEY_ESCAPE)
-                    glfwSetWindowShouldClose(window, true) // We will detect this in the rendering loop
-
-                renderer as DummyRenderer
-                when (key) {
-                    GLFW_KEY_UP -> renderer.camera()?.transform?.translation?.add(0f, .5f, 0f)
-                    GLFW_KEY_DOWN -> renderer.camera()?.transform?.translation?.add(0f, -.5f, 0f)
-                    GLFW_KEY_LEFT -> renderer.camera()?.transform?.translation?.add(-.5f, 0f, 0f)
-                    GLFW_KEY_RIGHT -> renderer.camera()?.transform?.translation?.add(.5f, 0f, 0f)
-
-                    GLFW_KEY_KP_ADD -> renderer.geoms.forEach { it.worldTransform.translation.z += 0.5f }
-                    GLFW_KEY_KP_SUBTRACT -> renderer.geoms.forEach { it.worldTransform.translation.z -= 0.5f }
-                }
-            }
+            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
+                glfwSetWindowShouldClose(window, true) // We will detect this in the rendering loop
         }
 
         glfwSetFramebufferSizeCallback(window) { window: Long, width: Int, height: Int ->
