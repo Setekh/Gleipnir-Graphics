@@ -35,10 +35,12 @@ import eu.corvus.corax.app.KeyEvent
 import eu.corvus.corax.scene.Camera
 import eu.corvus.corax.scene.geometry.Geometry
 import eu.corvus.corax.scene.geometry.Mesh
+import eu.corvus.corax.utils.Logger
 import org.joml.Math
 import org.joml.Math.toRadians
 import org.joml.Matrix4f
 import org.lwjgl.glfw.GLFW
+import org.lwjgl.opengl.GL20
 import org.lwjgl.opengl.GL30.*
 
 /**
@@ -95,16 +97,20 @@ class DummyRenderer(
             appendChild(Mesh("Quad-2").createSimple(vertices, indeces).also { it ->
                 geoms.add(it)
                 it.transform.translation.x = -1.2f
+                it.transform.translation.z = 3.2f
             })
         })
 
         geoms.reverse()
 
+        // Always on by default - will this be an issue later on tho?
         glEnable(GL_DEPTH_TEST)
+
         // Set the clear color
         glClearColor(0.13f, 0.13f, 0.13f, 0.13f)
 
         shader.createUniform("worldViewProjectionMatrix")
+        shader.createUniform("inf")
 
         input.map(Device.Keyboard, GLFW.GLFW_KEY_LEFT, "rotate-") { _, status ->
             if (status == KeyEvent.Released) {
@@ -147,6 +153,8 @@ class DummyRenderer(
                 "worldViewProjectionMatrix",
                 worldMatrix.set(camera.viewProjectionMatrix).mul(it.worldMatrix)
             )
+            shader.setUniform("inf", if (it.name != "Quad") 0.3f else 0.5f)
+
             it.render()
         }
 

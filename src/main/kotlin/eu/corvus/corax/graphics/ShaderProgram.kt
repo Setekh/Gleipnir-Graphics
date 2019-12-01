@@ -5,6 +5,7 @@ import org.lwjgl.opengl.GL20.*
 import java.nio.FloatBuffer
 import org.lwjgl.system.MemoryStack
 import org.joml.Matrix4f
+import org.lwjgl.opengl.GL20
 import java.util.HashMap
 
 
@@ -48,6 +49,11 @@ class ShaderProgram: Object() {
     fun setUniform(uniformName: String, value: Int) {
         val uniform = uniforms[uniformName] ?: return
         glUniform1i(uniform, value)
+    }
+
+    fun setUniform(uniformName: String, value: Float) {
+        val uniform = uniforms[uniformName] ?: return
+        glUniform1f(uniform, value)
     }
 
     fun createVertexShader(shaderCode: String) {

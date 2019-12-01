@@ -92,16 +92,16 @@ class SystemConsoleLogger: ILogger {
     private val classNameRegex = "[^\$]*".toRegex()
 
     override fun debug(message: String, vararg objs: Any) =
-        log(LogLevel.Debug, message, null, objs)
+        log(LogLevel.Debug, message, null, *objs)
 
     override fun info(message: String, vararg objs: Any) =
-        log(LogLevel.Info, message, null, objs)
+        log(LogLevel.Info, message, null, *objs)
 
     override fun warn(throwable: Throwable?, message: String?, vararg objs: Any) =
-        log(LogLevel.Warn, message, throwable, objs)
+        log(LogLevel.Warn, message, throwable, *objs)
 
     override fun error(throwable: Throwable?, message: String?, vararg objs: Any) =
-        log(LogLevel.Error, message, throwable, objs)
+        log(LogLevel.Error, message, throwable, *objs)
 
     override fun log(
         level: LogLevel,
@@ -115,9 +115,13 @@ class SystemConsoleLogger: ILogger {
         val mess = if (message.isNullOrBlank()) throwable?.message ?: "no message" else message
         val stream = if (level > LogLevel.Info) System.err else System.out
 
-        stream.printf("[${level.name.toUpperCase()}] ${formatClassName(element)}: $mess\n", *objs)
-        throwable?.printStackTrace(stream)
-        println()
+        stream.printf("[${level.name.toUpperCase()}] ${formatClassName(element)}: $mess", *objs)
+
+        if (throwable != null) {
+            stream.println()
+            throwable.printStackTrace(stream)
+        }
+        stream.println()
     }
 
     private fun formatClassName(element: StackTraceElement) = classNameRegex.find(element.className)?.value

@@ -70,4 +70,8 @@ open class Transform {
         parentTransform.rotation.transform(translation)
         translation.add(parentTrans)
     }
+
+    override fun toString(): String {
+        return "[$translation] [$rotation] [$scale]"
+    }
 }
