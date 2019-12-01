@@ -33,6 +33,7 @@ import eu.corvus.corax.app.Device
 import eu.corvus.corax.app.Input
 import eu.corvus.corax.app.InputAction
 import eu.corvus.corax.app.KeyEvent
+import eu.corvus.corax.utils.Logger
 
 /**
  * @author Vlad Ravenholm on 11/30/2019
@@ -43,9 +44,8 @@ class AppInput: Input {
 
     override fun keyPress(key: Int, event: KeyEvent) {
         if (event == KeyEvent.Repeat) return // not finding an use right now
-
-        val mapping = keyMap[key] ?: return let { System.err.println("No mapping for key $key") }
-        actions[mapping]?.invoke(mapping, event) ?: let { System.err.println("How did we get here? null mapping! $mapping") }
+        val mapping = keyMap[key] ?: return
+        actions[mapping]?.invoke(mapping, event) ?: let { Logger.error("How did we get here? null mapping! $mapping") }
     }
 
     override fun map(device: Device, target: Int, mapping: String, action: InputAction) {

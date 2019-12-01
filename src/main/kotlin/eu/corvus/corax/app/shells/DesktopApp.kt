@@ -34,6 +34,7 @@ import eu.corvus.corax.app.Input
 import eu.corvus.corax.app.KeyEvent
 import eu.corvus.corax.graphics.Renderer
 import eu.corvus.corax.app.Timer
+import eu.corvus.corax.utils.Logger
 import org.lwjgl.Version
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW.*
@@ -57,7 +58,7 @@ class DesktopApp(
     private var window: Long = 0
 
     init {
-        println("LWJGL ${Version.getVersion()} GLFW ${glfwGetVersionString()}!")
+        Logger.info("LWJGL ${Version.getVersion()} GLFW ${glfwGetVersionString()}!")
 
         startLifeCycle()
     }
@@ -92,14 +93,13 @@ class DesktopApp(
         if (window == NULL)
             throw RuntimeException("Failed to create the GLFW window")
 
-        glfwSetJoystickCallback { jid, event -> println("jid = [${jid}], event = [${event}]") }
+        glfwSetJoystickCallback { jid, event -> Logger.info("jid = [%s], event = [%s]", jid, event) }
 
         // Setup a key callback. It will be called every time a key is pressed, repeated or released.
         glfwSetKeyCallback(window) { window, key, scancode, action, mods ->
             if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
                 glfwSetWindowShouldClose(window, true) // We will detect this in the rendering loop
 
-            //println("window = [${window}], key = [${key}], scancode = [${scancode}], action = [${action}], mods = [${mods}]")
             input.keyPress(key, when(action) {
                 GLFW_PRESS -> KeyEvent.Pressed
                 GLFW_RELEASE -> KeyEvent.Released
@@ -148,6 +148,7 @@ class DesktopApp(
     }
 
     override fun onReady() {
+        Logger.error(RuntimeException("Oy iz redy"))
         // This line is critical for LWJGL's interoperation with GLFW's
         // OpenGL context, or any context that is managed externally.
         // LWJGL detects the context that is current in the current thread,

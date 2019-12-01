@@ -37,10 +37,9 @@ interface Input {
     fun remove(mapping: String)
 
     /**
-     * Usually available on desktop, so no need to map keys to anything else
+     * Usually available on desktop, so no need to map keys to any other device or map GLFW to anything else
      */
     fun keyPress(key: Int, event: KeyEvent)
-
 }
 
 enum class KeyEvent { Pressed, Released, Repeat }
