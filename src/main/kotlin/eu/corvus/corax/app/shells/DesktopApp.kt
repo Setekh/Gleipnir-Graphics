@@ -148,7 +148,6 @@ class DesktopApp(
     }
 
     override fun onReady() {
-        Logger.error(RuntimeException("Oy iz redy"))
         // This line is critical for LWJGL's interoperation with GLFW's
         // OpenGL context, or any context that is managed externally.
         // LWJGL detects the context that is current in the current thread,
