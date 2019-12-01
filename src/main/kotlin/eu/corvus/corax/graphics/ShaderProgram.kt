@@ -12,6 +12,7 @@ import java.util.HashMap
 /**
  * stolen
  */
+@Deprecated(message = "To be replaced with proper implementation")
 class ShaderProgram: Object() {
     private var programId: Int
     private var vertexShaderId: Int = 0

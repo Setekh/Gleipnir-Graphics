@@ -130,11 +130,6 @@ class DummyRenderer(
     }
 
     override fun onPreRender(tpf: Float) {
-        val removedSome = geoms.removeAll { it !is Mesh || it.glObject == null }
-
-        if (removedSome)
-            println("Removed some dangling geometries!")
-
         geoms.forEach {
             it.update(tpf)
         }
