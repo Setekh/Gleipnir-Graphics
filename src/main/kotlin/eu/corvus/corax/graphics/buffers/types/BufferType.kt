@@ -1,4 +1,4 @@
-package eu.corvus.corax.scene.geometry.buffers
+package eu.corvus.corax.graphics.buffers.types
 
 enum class BufferType(val size: Int) {
         Vertex(3),

@@ -29,14 +29,16 @@
  */
 package eu.corvus.corax.scene
 
+import eu.corvus.corax.scene.graph.SceneGraph
+import eu.corvus.corax.scene.graph.SceneGraphImpl
+import eu.corvus.corax.scene.pool.ObjectPool
+import eu.corvus.corax.scene.pool.ObjectPoolImpl
 import org.koin.dsl.module
 
 /**
  * @author Vlad Ravenholm on 11/24/2019
  */
-
-private val dataModule = module {
-    
+val sceneGraphModules = module {
+    single<SceneGraph> { SceneGraphImpl() }
+    single<ObjectPool> { ObjectPoolImpl() }
 }
-
-val sceneGraphModules = dataModule

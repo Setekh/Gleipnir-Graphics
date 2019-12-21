@@ -27,49 +27,21 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.scene.geometry.buffers
+package eu.corvus.corax.graphics.context
 
-import eu.corvus.corax.utils.Disposable
-import org.lwjgl.opengl.GL15
-import org.lwjgl.opengl.GL30.*
-import org.lwjgl.system.MemoryUtil
-import java.lang.RuntimeException
-import java.nio.Buffer
-import java.nio.FloatBuffer
-import java.nio.IntBuffer
+import eu.corvus.corax.graphics.buffers.BufferObject
+import eu.corvus.corax.graphics.buffers.VertexArrayObject
+import eu.corvus.corax.graphics.buffers.VertexBufferObject
 
 /**
- * @author Vlad Ravenholm on 11/24/2019
+ * @author Vlad Ravenholm on 12/21/2019
  */
-data class VertexBufferObject(val buffer: Buffer, val type: BufferType) : Disposable {
-    val id: Int = glGenBuffers()
-
-    var size: Int = 0
-        private set
-
-    fun initialize(free: Boolean = false) { // we may want to not free it, to make collisions shapes later
-        // Idea: Free it on render in release, and in a debug/editing flag the buffer will persist, also free it if the scene is unloaded
-        when (type) {
-            BufferType.Vertex -> {
-                glBindBuffer(GL_ARRAY_BUFFER, id)
-                glBufferData(GL_ARRAY_BUFFER, buffer as FloatBuffer, GL_STATIC_DRAW)
-                glVertexAttribPointer(0, type.size, GL_FLOAT, false, 0, 0)
-                glBindBuffer(GL_ARRAY_BUFFER, 0)
-            }
-            BufferType.Indices -> {
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id)
-                glBufferData(GL_ELEMENT_ARRAY_BUFFER, buffer as IntBuffer, GL_STATIC_DRAW)
-            }
-            else -> throw RuntimeException("No such vbo type! ${buffer.javaClass}")
-        }
-
-        size = buffer.limit()
-        if (free)
-            MemoryUtil.memFree(buffer)
-    }
-
-    override fun free() {
-        glDeleteBuffers(id)
-        MemoryUtil.memFree(buffer)
-    }
+interface RendererContext {
+    fun bindBufferArray(vertexArrayObject: VertexArrayObject)
+    fun unbindBufferArray(vertexArrayObject: VertexArrayObject)
+    fun unbindBufferObject(vertexBufferObject: VertexBufferObject)
+    fun bindBufferObject(vertexBufferObject: VertexBufferObject)
+    fun createArrayBufferData(vertexArrayObject: VertexArrayObject)
+    fun free(bufferObject: BufferObject)
+    fun draw(vertexArrayObject: VertexArrayObject)
 }

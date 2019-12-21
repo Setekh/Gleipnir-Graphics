@@ -27,24 +27,36 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.app
+package eu.corvus.corax.graphics.buffers
 
-import eu.corvus.corax.app.input.AppInput
-import eu.corvus.corax.app.shells.DesktopApp
-import eu.corvus.corax.app.timers.NanoTimer
-import org.koin.dsl.module
+import eu.corvus.corax.graphics.buffers.types.BufferType
+import org.lwjgl.opengl.GL30.*
+import org.lwjgl.system.MemoryUtil
+import java.nio.Buffer
 
 /**
  * @author Vlad Ravenholm on 11/24/2019
  */
+abstract class VertexBufferObject(buffer: Buffer, val type: BufferType) : BufferObject() {
+    var buffer: Buffer? = buffer
+        private set
 
-val appModule = module {
-    single<Timer> { NanoTimer() }
-    single<Input> { AppInput() }
+    override var id: Int = 0
 
-    single<GleipnirApplication>(createdAtStart = true) {
-        // Here will check the platform and see what type of app to start
-        DesktopApp(getProperty("engine.name"), get(), get(), get(), get())
+    override fun onAssign(bufferId: Int) {
+        id = bufferId
     }
 
+    fun clearData() {
+        MemoryUtil.memFree(buffer)
+        buffer = null
+    }
+
+    override fun free() {
+        super.free()
+
+        val buffer = buffer ?: return
+        if (buffer.remaining() > 0)
+            MemoryUtil.memFree(buffer)
+    }
 }

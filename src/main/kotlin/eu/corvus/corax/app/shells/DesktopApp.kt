@@ -34,6 +34,7 @@ import eu.corvus.corax.app.Input
 import eu.corvus.corax.app.KeyEvent
 import eu.corvus.corax.graphics.Renderer
 import eu.corvus.corax.app.Timer
+import eu.corvus.corax.scene.graph.SceneGraph
 import eu.corvus.corax.utils.Logger
 import org.lwjgl.Version
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
@@ -51,9 +52,10 @@ import org.lwjgl.system.Platform
 class DesktopApp(
     title: String = "App Window",
     timer: Timer,
+    sceneGraph: SceneGraph,
     private val input: Input,
     private val renderer: Renderer
-    ): GleipnirApplication(title, timer) {
+    ): GleipnirApplication(title, timer, sceneGraph) {
     // The window handle
     private var window: Long = 0
 
