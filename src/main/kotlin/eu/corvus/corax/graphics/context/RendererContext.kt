@@ -29,6 +29,7 @@
  */
 package eu.corvus.corax.graphics.context
 
+import eu.corvus.corax.graphics.Color
 import eu.corvus.corax.graphics.buffers.BufferObject
 import eu.corvus.corax.graphics.buffers.VertexArrayObject
 import eu.corvus.corax.graphics.buffers.VertexBufferObject
@@ -37,6 +38,36 @@ import eu.corvus.corax.graphics.buffers.VertexBufferObject
  * @author Vlad Ravenholm on 12/21/2019
  */
 interface RendererContext {
+
+    /**
+     * @param x the left viewport coordinate
+     * @param y the bottom viewport coordinate
+     * @param w the viewport width
+     * @param h the viewport height
+     *
+     * @see <a target="_blank" href="http://docs.gl/gl4/glViewport">Reference Page</a>
+     */
+    fun viewPort(x: Int, y: Int, w: Int, h: Int)
+
+    /**
+     * Sets portions of every pixel in a particular buffer to the same value. The value to which each buffer is cleared depends on the setting of the clear
+     * value for that buffer.
+     *
+     * @param mask Zero or the bitwise OR of one or more values indicating which buffers are to be cleared. One or more of:<br><table><tr><td>{@link GL11C#GL_COLOR_BUFFER_BIT COLOR_BUFFER_BIT}</td><td>{@link GL11C#GL_DEPTH_BUFFER_BIT DEPTH_BUFFER_BIT}</td><td>{@link GL11C#GL_STENCIL_BUFFER_BIT STENCIL_BUFFER_BIT}</td></tr></table>
+     *
+     * @see <a target="_blank" href="http://docs.gl/gl4/glClear">Reference Page</a>
+     */
+    fun clear(mask: Int)
+
+    /**
+     * Sets the clear value for fixed-point and floating-point color buffers in RGBA mode. The specified components are stored as floating-point values.
+     *
+     * @see <a target="_blank" href="http://docs.gl/gl4/glClearColor">Reference Page</a>
+     */
+    fun clearColor(color: Color)
+
+    fun enable(mask: Int)
+
     fun bindBufferArray(vertexArrayObject: VertexArrayObject)
     fun unbindBufferArray(vertexArrayObject: VertexArrayObject)
     fun unbindBufferObject(vertexBufferObject: VertexBufferObject)

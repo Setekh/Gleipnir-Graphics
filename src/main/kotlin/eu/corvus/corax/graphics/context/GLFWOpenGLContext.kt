@@ -1,5 +1,6 @@
 package eu.corvus.corax.graphics.context
 
+import eu.corvus.corax.graphics.*
 import eu.corvus.corax.graphics.buffers.BufferObject
 import eu.corvus.corax.graphics.buffers.VertexArrayObject
 import eu.corvus.corax.graphics.buffers.VertexBufferObject
@@ -12,6 +13,14 @@ import java.nio.FloatBuffer
 import java.nio.IntBuffer
 
 class GLFWOpenGLContext : RendererContext {
+    override fun viewPort(x: Int, y: Int, w: Int, h: Int) = glViewport(x, y, w, h)
+
+    override fun clear(mask: Int) = glClear(mask)
+
+    override fun clearColor(color: Color) = glClearColor(color.r(), color.g(), color.b(), color.a())
+
+    override fun enable(mask: Int) = glEnable(mask)
+
     override fun bindBufferArray(vertexArrayObject: VertexArrayObject) {
         glBindVertexArray(vertexArrayObject.id)
     }
@@ -67,7 +76,7 @@ class GLFWOpenGLContext : RendererContext {
 
     override fun draw(vertexArrayObject: VertexArrayObject) {
         // Render the vertex buffer
-        glEnableVertexAttribArray(0) // TODO this should be in a material state
+        glEnableVertexAttribArray(0) // TODO this should be in a material
         //glEnableVertexAttribArray(1)
 
         glDrawElements(GL_TRIANGLES, vertexArrayObject.vertexSize, GL_UNSIGNED_INT, 0)
