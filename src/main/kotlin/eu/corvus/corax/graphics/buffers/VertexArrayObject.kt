@@ -27,24 +27,44 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.app
+package eu.corvus.corax.graphics.buffers
 
-import eu.corvus.corax.app.input.AppInput
-import eu.corvus.corax.app.shells.DesktopApp
-import eu.corvus.corax.app.timers.NanoTimer
-import org.koin.dsl.module
+import eu.corvus.corax.graphics.buffers.types.BufferType
+import eu.corvus.corax.graphics.buffers.types.IndexBuffer
+import eu.corvus.corax.graphics.buffers.types.VertexBuffer
 
 /**
  * @author Vlad Ravenholm on 11/24/2019
  */
+class VertexArrayObject(
+    val vertexBuffers: Array<VertexBufferObject?> = arrayOfNulls(BufferType.values().size)
+): BufferObject() {
+    override var id: Int = 0
 
-val appModule = module {
-    single<Timer> { NanoTimer() }
-    single<Input> { AppInput() }
+    var size: Int = 0
+        private set
 
-    single<GleipnirApplication>(createdAtStart = true) {
-        // Here will check the platform and see what type of app to start
-        DesktopApp(getProperty("engine.name"), get(), get(), get(), get())
+    override fun onAssign(bufferId: Int) {
+        id = bufferId
+
+        val indexBuffer = vertexBuffers[BufferType.Indices.ordinal] as IndexBuffer
+        size = indexBuffer.size
     }
 
+    fun addIndexBuffer(indices: IntArray) {
+        val indexBuffer = IndexBuffer(indices.size)
+        indexBuffer.data()!!.put(indices).flip()
+        vertexBuffers[indexBuffer.type.ordinal] = indexBuffer
+    }
+
+    fun addVertexBuffer(vertexArray: FloatArray) {
+        val vertexBuffer = VertexBuffer(vertexArray.size)
+        vertexBuffer.data()!!.put(vertexArray).flip()
+        vertexBuffers[vertexBuffer.type.ordinal] = vertexBuffer
+    }
+
+    override fun free() {
+        super.free()
+        vertexBuffers.forEach { it?.free() }
+    }
 }

@@ -29,6 +29,8 @@
  */
 package eu.corvus.corax.graphics
 
+import eu.corvus.corax.graphics.context.GLFWOpenGLContext
+import eu.corvus.corax.graphics.context.RendererContext
 import org.koin.dsl.module
 
 /**
@@ -36,7 +38,8 @@ import org.koin.dsl.module
  */
 
 val graphicsModule = module {
+    single<RendererContext> { GLFWOpenGLContext() }
     single<Renderer> {
-        DummyRenderer(get())
+        DummyRenderer(get(), get())
     }
 }

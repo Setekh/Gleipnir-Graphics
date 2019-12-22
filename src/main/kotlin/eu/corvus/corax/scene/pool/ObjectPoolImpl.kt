@@ -27,32 +27,19 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.scene.geometry.buffers
+package eu.corvus.corax.scene.pool
 
-import eu.corvus.corax.utils.Disposable
-import org.lwjgl.opengl.GL30
+import eu.corvus.corax.scene.Object
 
 /**
- * @author Vlad Ravenholm on 11/24/2019
+ * @author Vlad Ravenholm on 12/15/2019
  */
-data class VertexArrayObject(
-    val vertexBuffers: Map<BufferType, VertexBufferObject> = mutableMapOf()
-): Disposable {
-    val id: Int = GL30.glGenVertexArrays()
-    private val mVertexBuffers = vertexBuffers as MutableMap
+class ObjectPoolImpl: ObjectPool {
 
-    fun createBuffers(body : MutableMap<BufferType, VertexBufferObject>.() -> Unit) {
-        body.invoke(mVertexBuffers)
-
-        GL30.glBindVertexArray(id)
-        for (value in vertexBuffers.values) {
-            value.initialize()
-        }
-        GL30.glBindVertexArray(0)
+    override fun create(): Int {
+        return 0
     }
 
-    override fun free() {
-        GL30.glDeleteVertexArrays(id)
-        mVertexBuffers.values.forEach { it.free() }
+    override fun free(obj: Object) {
     }
 }

@@ -27,24 +27,15 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.app
+package eu.corvus.corax.scene.graph
 
-import eu.corvus.corax.app.input.AppInput
-import eu.corvus.corax.app.shells.DesktopApp
-import eu.corvus.corax.app.timers.NanoTimer
-import org.koin.dsl.module
+import eu.corvus.corax.scene.Node
 
 /**
- * @author Vlad Ravenholm on 11/24/2019
+ * @author Vlad Ravenholm on 12/2/2019
  */
+interface SceneGraph {
+    val rootNode: Node
 
-val appModule = module {
-    single<Timer> { NanoTimer() }
-    single<Input> { AppInput() }
-
-    single<GleipnirApplication>(createdAtStart = true) {
-        // Here will check the platform and see what type of app to start
-        DesktopApp(getProperty("engine.name"), get(), get(), get(), get())
-    }
 
 }

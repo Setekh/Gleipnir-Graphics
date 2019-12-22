@@ -27,24 +27,22 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.app
+package eu.corvus.corax.graphics
 
-import eu.corvus.corax.app.input.AppInput
-import eu.corvus.corax.app.shells.DesktopApp
-import eu.corvus.corax.app.timers.NanoTimer
-import org.koin.dsl.module
+import org.joml.Vector4f
 
 /**
- * @author Vlad Ravenholm on 11/24/2019
+ * @author Vlad Ravenholm on 12/22/2019
  */
-
-val appModule = module {
-    single<Timer> { NanoTimer() }
-    single<Input> { AppInput() }
-
-    single<GleipnirApplication>(createdAtStart = true) {
-        // Here will check the platform and see what type of app to start
-        DesktopApp(getProperty("engine.name"), get(), get(), get(), get())
+class Color : Vector4f() {
+    companion object {
+        fun of(r: Float, g: Float, b: Float, a: Float = 1f) : Color {
+            return Color().apply { set(r, g, b, a) }
+        }
     }
-
 }
+
+fun Color.r() = x
+fun Color.g() = y
+fun Color.b() = z
+fun Color.a() = w

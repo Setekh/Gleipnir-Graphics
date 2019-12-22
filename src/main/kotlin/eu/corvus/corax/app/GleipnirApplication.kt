@@ -29,6 +29,7 @@
  */
 package eu.corvus.corax.app
 
+import eu.corvus.corax.scene.graph.SceneGraph
 import org.koin.core.KoinComponent
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -38,7 +39,8 @@ import java.util.logging.Logger
  */
 abstract class GleipnirApplication(
     val title: String,
-    var timer: Timer
+    var timer: Timer,
+    var sceneGraph: SceneGraph
 ): KoinComponent {
     var width: Int = 640
         private set

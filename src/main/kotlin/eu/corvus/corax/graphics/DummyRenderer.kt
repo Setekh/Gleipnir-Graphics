@@ -32,21 +32,22 @@ package eu.corvus.corax.graphics
 import eu.corvus.corax.app.Device
 import eu.corvus.corax.app.Input
 import eu.corvus.corax.app.KeyEvent
+import eu.corvus.corax.graphics.buffers.isUploaded
+import eu.corvus.corax.graphics.context.RendererContext
 import eu.corvus.corax.scene.Camera
 import eu.corvus.corax.scene.geometry.Geometry
 import eu.corvus.corax.scene.geometry.Mesh
-import eu.corvus.corax.utils.Logger
-import org.joml.Math
 import org.joml.Math.toRadians
 import org.joml.Matrix4f
 import org.lwjgl.glfw.GLFW
-import org.lwjgl.opengl.GL20
 import org.lwjgl.opengl.GL30.*
 
 /**
  * @author Vlad Ravenholm on 11/24/2019
+ * Badly representing a desktop gl renderer
  */
 class DummyRenderer(
+    private val rendererContext: RendererContext,
     private val input: Input
 ) : Renderer {
     private var width: Int = 300
@@ -54,6 +55,7 @@ class DummyRenderer(
 
     val geoms = arrayListOf<Geometry>()
     private val camera: Camera = Camera()
+    private val viewPortColor = Color.of(0.13f, 0.13f, 0.13f)
 
     private val worldMatrix = Matrix4f()
 
@@ -91,8 +93,8 @@ class DummyRenderer(
         val mesh: Mesh
         geoms.add(Mesh("Quad").createSimple(vertices, indeces).apply {
             mesh = this
-            transform.rotation.rotationY(Math.toRadians(60.0).toFloat())
-            transform.rotation.rotateX(Math.toRadians(-90.0).toFloat())
+            transform.rotation.rotationY(toRadians(60.0).toFloat())
+            transform.rotation.rotateX(toRadians(-90.0).toFloat())
 
             appendChild(Mesh("Quad-2").createSimple(vertices, indeces).also { it ->
                 geoms.add(it)
@@ -103,11 +105,11 @@ class DummyRenderer(
 
         geoms.reverse()
 
-        // Always on by default - will this be an issue later on tho?
-        glEnable(GL_DEPTH_TEST)
+        // Always on by default
+        rendererContext.enable(GL_DEPTH_TEST)
 
         // Set the clear color
-        glClearColor(0.13f, 0.13f, 0.13f, 0.13f)
+        rendererContext.clearColor(viewPortColor)
 
         shader.createUniform("worldViewProjectionMatrix")
         shader.createUniform("inf")
@@ -137,31 +139,39 @@ class DummyRenderer(
 
     override fun onPreRender(tpf: Float) {
         geoms.forEach {
+            it.vertexArrayObject?.let { vao ->
+                if (!vao.isUploaded())
+                    rendererContext.createArrayBufferData(vao)
+            }
             it.update(tpf)
         }
         camera.computeMatrices()
     }
 
     override fun onRender() {
-        glViewport(0, 0, width, height)
-        glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
+        rendererContext.viewPort(0, 0, width, height)
+        rendererContext.clear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
-        shader.bind() // This should be an instruction for the renderer
+        shader.bind() // This should be in a material?
 
         geoms.forEach {
+            val vertexArrayObject = it.vertexArrayObject ?: return@forEach
+
             shader.setUniform(
                 "worldViewProjectionMatrix",
                 worldMatrix.set(camera.viewProjectionMatrix).mul(it.worldMatrix)
             )
             shader.setUniform("inf", if (it.name != "Quad") 0.3f else 0.5f)
 
-            it.render()
+            rendererContext.bindBufferArray(vertexArrayObject)
+            rendererContext.draw(vertexArrayObject)
+            rendererContext.unbindBufferArray(vertexArrayObject)
         }
 
         shader.unbind()
     }
 
     override fun onDestroy() {
-        geoms.filterIsInstance<Mesh>().forEach { it.glObject?.free() }
+        geoms.filterIsInstance<Mesh>().forEach { it.vertexArrayObject?.free() }
     }
 }
