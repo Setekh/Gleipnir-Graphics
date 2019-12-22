@@ -5,6 +5,7 @@ import eu.corvus.corax.graphics.buffers.BufferObject
 import eu.corvus.corax.graphics.buffers.VertexArrayObject
 import eu.corvus.corax.graphics.buffers.VertexBufferObject
 import eu.corvus.corax.graphics.buffers.data
+import eu.corvus.corax.graphics.buffers.types.BufferType
 import eu.corvus.corax.graphics.buffers.types.IndexBuffer
 import eu.corvus.corax.graphics.buffers.types.VertexBuffer
 import org.lwjgl.opengl.GL15
@@ -79,7 +80,7 @@ class GLFWOpenGLContext : RendererContext {
         glEnableVertexAttribArray(0) // TODO this should be in a material
         //glEnableVertexAttribArray(1)
 
-        glDrawElements(GL_TRIANGLES, vertexArrayObject.vertexSize, GL_UNSIGNED_INT, 0)
+        glDrawElements(GL_TRIANGLES, vertexArrayObject.size, GL_UNSIGNED_INT, 0)
 
         glDisableVertexAttribArray(0)
         //glDisableVertexAttribArray(1)
@@ -93,10 +94,10 @@ class GLFWOpenGLContext : RendererContext {
     }
 
     private fun targetBufferType(vertexBufferObject: VertexBufferObject): Int {
-        return when (vertexBufferObject) {
-            is VertexBuffer -> GL15.GL_ARRAY_BUFFER
-            is IndexBuffer -> GL15.GL_ELEMENT_ARRAY_BUFFER
-            else -> GL15.GL_ARRAY_BUFFER
+        return when (vertexBufferObject.type) {
+            BufferType.Vertex -> GL15.GL_ARRAY_BUFFER
+            BufferType.Indices -> GL15.GL_ELEMENT_ARRAY_BUFFER
+            else -> error("Unknown buffer type! ${vertexBufferObject.type}")
         }
     }
 }

@@ -41,14 +41,14 @@ class VertexArrayObject(
 ): BufferObject() {
     override var id: Int = 0
 
-    var vertexSize: Int = 0
+    var size: Int = 0
         private set
 
     override fun onAssign(bufferId: Int) {
         id = bufferId
 
-        val vertexBuffer = vertexBuffers[BufferType.Indices.ordinal] as IndexBuffer
-        vertexSize = vertexBuffer.size
+        val indexBuffer = vertexBuffers[BufferType.Indices.ordinal] as IndexBuffer
+        size = indexBuffer.size
     }
 
     fun addIndexBuffer(indices: IntArray) {
