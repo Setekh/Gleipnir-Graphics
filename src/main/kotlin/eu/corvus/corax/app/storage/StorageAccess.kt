@@ -27,31 +27,16 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.app
+package eu.corvus.corax.app.storage
 
-import eu.corvus.corax.app.input.AppInput
-import eu.corvus.corax.app.shells.DesktopApp
-import eu.corvus.corax.app.storage.DesktopStorageAccess
-import eu.corvus.corax.app.storage.StorageAccess
-import eu.corvus.corax.app.timers.NanoTimer
-import org.koin.dsl.module
+import java.io.InputStream
+import java.io.OutputStream
 
 /**
- * @author Vlad Ravenholm on 11/24/2019
+ * @author Vlad Ravenholm on 12/28/2019
  */
-
-val appModule = module {
-    single<Timer> { NanoTimer() }
-    single<Input> { AppInput() }
-
-    single<StorageAccess> {
-        // TODO check for platform
-        DesktopStorageAccess()
-    }
-
-    single<GleipnirApplication>(createdAtStart = true) {
-        // Here will check the platform and see what type of app to start
-        DesktopApp(getProperty("engine.name"), get(), get(), get(), get())
-    }
-
+interface StorageAccess {
+    suspend fun readFrom(path: String, block: (InputStream) -> Unit)
+    suspend fun writeTo(path: String, block: (OutputStream) -> Unit)
+    suspend fun delete(path: String): Boolean
 }

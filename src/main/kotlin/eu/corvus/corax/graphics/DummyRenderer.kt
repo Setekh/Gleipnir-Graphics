@@ -111,6 +111,9 @@ class DummyRenderer(
         // Set the clear color
         rendererContext.clearColor(viewPortColor)
 
+        //glEnable(GL_CULL_FACE)
+        //glCullFace(GL_BACK)
+
         shader.createUniform("worldViewProjectionMatrix")
         shader.createUniform("inf")
 

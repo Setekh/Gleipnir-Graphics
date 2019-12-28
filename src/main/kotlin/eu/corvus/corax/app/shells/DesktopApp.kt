@@ -36,6 +36,10 @@ import eu.corvus.corax.graphics.Renderer
 import eu.corvus.corax.app.Timer
 import eu.corvus.corax.scene.graph.SceneGraph
 import eu.corvus.corax.utils.Logger
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.newSingleThreadContext
 import org.lwjgl.Version
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW.*
@@ -45,6 +49,7 @@ import org.lwjgl.opengl.GL30.GL_TRUE
 import org.lwjgl.system.MemoryStack.stackPush
 import org.lwjgl.system.MemoryUtil.NULL
 import org.lwjgl.system.Platform
+import kotlin.coroutines.CoroutineContext
 
 /**
  * GLFW app for desktop uses
@@ -55,9 +60,12 @@ class DesktopApp(
     sceneGraph: SceneGraph,
     private val input: Input,
     private val renderer: Renderer
-    ): GleipnirApplication(title, timer, sceneGraph) {
+    ): GleipnirApplication(title, timer, sceneGraph), CoroutineScope {
     // The window handle
     private var window: Long = 0
+
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Unconfined
 
     init {
         Logger.info("LWJGL ${Version.getVersion()} GLFW ${glfwGetVersionString()}!")
@@ -165,7 +173,6 @@ class DesktopApp(
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
         while (!glfwWindowShouldClose(window)) {
-
             update()
 
             glfwSwapBuffers(window) // swap the color buffers
