@@ -60,12 +60,9 @@ class DesktopApp(
     sceneGraph: SceneGraph,
     private val input: Input,
     private val renderer: Renderer
-    ): GleipnirApplication(title, timer, sceneGraph), CoroutineScope {
+    ): GleipnirApplication(title, timer, sceneGraph) {
     // The window handle
     private var window: Long = 0
-
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Unconfined
 
     init {
         Logger.info("LWJGL ${Version.getVersion()} GLFW ${glfwGetVersionString()}!")
