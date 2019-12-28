@@ -31,6 +31,7 @@ package eu.corvus.corax.graphics.buffers
 
 import eu.corvus.corax.graphics.buffers.types.BufferType
 import eu.corvus.corax.graphics.buffers.types.IndexBuffer
+import eu.corvus.corax.graphics.buffers.types.TextureCoordsBuffer
 import eu.corvus.corax.graphics.buffers.types.VertexBuffer
 
 /**
@@ -54,12 +55,22 @@ class VertexArrayObject(
     fun addIndexBuffer(indices: IntArray) {
         val indexBuffer = IndexBuffer(indices.size)
         indexBuffer.data()!!.put(indices).flip()
-        vertexBuffers[indexBuffer.type.ordinal] = indexBuffer
+        addBuffer(indexBuffer)
     }
 
     fun addVertexBuffer(vertexArray: FloatArray) {
         val vertexBuffer = VertexBuffer(vertexArray.size)
         vertexBuffer.data()!!.put(vertexArray).flip()
+        addBuffer(vertexBuffer)
+    }
+
+    fun addTextureCoords(texCoords: FloatArray) {
+        val textureCoordsBuffer = TextureCoordsBuffer(texCoords.size)
+        textureCoordsBuffer.data()!!.put(texCoords).flip()
+        addBuffer(textureCoordsBuffer)
+    }
+
+    private fun addBuffer(vertexBuffer: VertexBufferObject) {
         vertexBuffers[vertexBuffer.type.ordinal] = vertexBuffer
     }
 

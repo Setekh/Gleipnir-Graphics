@@ -30,6 +30,7 @@
 package eu.corvus.corax.graphics.buffers
 
 import eu.corvus.corax.graphics.buffers.types.IndexBuffer
+import eu.corvus.corax.graphics.buffers.types.TextureCoordsBuffer
 import eu.corvus.corax.graphics.buffers.types.VertexBuffer
 import java.nio.FloatBuffer
 import java.nio.IntBuffer
@@ -41,4 +42,5 @@ import java.nio.IntBuffer
 fun BufferObject.isUploaded() = id > 0
 
 fun VertexBuffer.data(): FloatBuffer? = buffer as FloatBuffer?
+fun TextureCoordsBuffer.data(): FloatBuffer? = buffer as FloatBuffer?
 fun IndexBuffer.data(): IntBuffer? = buffer as IntBuffer?

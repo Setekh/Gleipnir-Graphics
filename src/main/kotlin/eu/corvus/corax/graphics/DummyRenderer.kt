@@ -35,12 +35,20 @@ import eu.corvus.corax.app.KeyEvent
 import eu.corvus.corax.graphics.buffers.isUploaded
 import eu.corvus.corax.graphics.context.RendererContext
 import eu.corvus.corax.scene.Camera
+import eu.corvus.corax.scene.assets.AssetManager
 import eu.corvus.corax.scene.geometry.Geometry
 import eu.corvus.corax.scene.geometry.Mesh
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.joml.Math.toRadians
 import org.joml.Matrix4f
+import org.koin.core.Koin
+import org.koin.core.context.GlobalContext
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.opengl.GL30.*
+import javax.xml.bind.JAXBElement
 
 /**
  * @author Vlad Ravenholm on 11/24/2019
@@ -87,8 +95,8 @@ class DummyRenderer(
 
         val indeces = intArrayOf(0, 1, 3, 3, 1, 2)
 
-        camera.transform.rotation.rotateX(toRadians(-90.0).toFloat())
-        camera.transform.translation.set(0f, 3f, 0f)
+        //camera.transform.rotation.rotateX(toRadians(-90.0).toFloat())
+        camera.transform.translation.set(0f, 0f, -3f)
 
         val mesh: Mesh
         geoms.add(Mesh("Quad").createSimple(vertices, indeces).apply {
@@ -102,6 +110,16 @@ class DummyRenderer(
                 it.transform.translation.z = 3.2f
             })
         })
+
+        val koin = GlobalContext.get().koin
+        val assetManager = koin.get<AssetManager>()
+
+        GlobalScope.launch {
+            val spatial = assetManager.loadSpatial("test-data/test/obj/blobby.obj")
+            withContext(Dispatchers.Unconfined) {
+                geoms.add(spatial.children.first() as Geometry)
+            }
+        }
 
         geoms.reverse()
 
@@ -128,6 +146,34 @@ class DummyRenderer(
             if (status == KeyEvent.Released) {
                 mesh.transform.rotation.rotateZ(toRadians(10.0).toFloat())
                 mesh.forceUpdate()
+            }
+        }
+
+
+        input.map(Device.Keyboard, GLFW.GLFW_KEY_W, "forward") { _, status ->
+            if (status == KeyEvent.Pressed) {
+                camera.transform.translation.z += .6f
+                camera.forceUpdate()
+            }
+        }
+
+        input.map(Device.Keyboard, GLFW.GLFW_KEY_S, "forward-") { _, status ->
+            if (status == KeyEvent.Pressed) {
+                camera.transform.translation.z -= .6f
+                camera.forceUpdate()
+            }
+        }
+        input.map(Device.Keyboard, GLFW.GLFW_KEY_A, "left-s") { _, status ->
+            if (status == KeyEvent.Pressed) {
+                camera.transform.translation.x += .6f
+                camera.forceUpdate()
+            }
+        }
+
+        input.map(Device.Keyboard, GLFW.GLFW_KEY_D, "left-s-") { _, status ->
+            if (status == KeyEvent.Pressed) {
+                camera.transform.translation.x -= .6f
+                camera.forceUpdate()
             }
         }
     }

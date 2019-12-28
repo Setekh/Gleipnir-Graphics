@@ -27,21 +27,26 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.scene
+package eu.corvus.corax.scene.assets.loaders
 
-import eu.corvus.corax.scene.assets.AssetManager
-import eu.corvus.corax.scene.assets.AssetManagerImpl
-import eu.corvus.corax.scene.graph.SceneGraph
-import eu.corvus.corax.scene.graph.SceneGraphImpl
-import eu.corvus.corax.scene.pool.ObjectPool
-import eu.corvus.corax.scene.pool.ObjectPoolImpl
-import org.koin.dsl.module
+import org.lwjgl.assimp.AIMesh
 
 /**
- * @author Vlad Ravenholm on 11/24/2019
+ * @author Vlad Ravenholm on 12/28/2019
  */
-val sceneGraphModules = module {
-    single<AssetManager> { AssetManagerImpl(get()) }
-    single<SceneGraph> { SceneGraphImpl() }
-    single<ObjectPool> { ObjectPoolImpl() }
-}
+
+fun AIMesh.getVertices(): FloatArray = mVertices().map { listOf(it.x(), it.y(), it.z()) }.flatten().toFloatArray()
+fun AIMesh.getTexCoords(): FloatArray? = mTextureCoords(0)?.map { listOf(it.x(), it.y()) }?.flatten()?.toFloatArray()
+
+fun AIMesh.getNormals(): FloatArray? = mNormals()?.map { listOf(it.x(), it.y(), it.z()) }?.flatten()?.toFloatArray()
+fun AIMesh.getTangents(): FloatArray? = mTangents()?.map { listOf(it.x(), it.y(), it.z()) }?.flatten()?.toFloatArray()
+fun AIMesh.getBitangents(): FloatArray? = mBitangents()?.map { listOf(it.x(), it.y(), it.z()) }?.flatten()?.toFloatArray()
+
+fun AIMesh.getIndices(): IntArray = mFaces().map {
+    val collect = mutableListOf<Int>()
+    val mIndices = it.mIndices()
+    while (mIndices.remaining() > 0)
+        collect.add(mIndices.get())
+
+    collect
+}.flatten().toIntArray()

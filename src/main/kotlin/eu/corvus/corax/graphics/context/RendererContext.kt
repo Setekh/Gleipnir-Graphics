@@ -33,6 +33,7 @@ import eu.corvus.corax.graphics.Color
 import eu.corvus.corax.graphics.buffers.BufferObject
 import eu.corvus.corax.graphics.buffers.VertexArrayObject
 import eu.corvus.corax.graphics.buffers.VertexBufferObject
+import eu.corvus.corax.scene.Object
 
 /**
  * @author Vlad Ravenholm on 12/21/2019
@@ -73,6 +74,6 @@ interface RendererContext {
     fun unbindBufferObject(vertexBufferObject: VertexBufferObject)
     fun bindBufferObject(vertexBufferObject: VertexBufferObject)
     fun createArrayBufferData(vertexArrayObject: VertexArrayObject)
-    fun free(bufferObject: BufferObject)
+    fun free(glObject: Object)
     fun draw(vertexArrayObject: VertexArrayObject)
 }

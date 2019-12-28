@@ -32,14 +32,10 @@ package eu.corvus.corax.app.shells
 import eu.corvus.corax.app.GleipnirApplication
 import eu.corvus.corax.app.Input
 import eu.corvus.corax.app.KeyEvent
-import eu.corvus.corax.graphics.Renderer
 import eu.corvus.corax.app.Timer
+import eu.corvus.corax.graphics.Renderer
 import eu.corvus.corax.scene.graph.SceneGraph
 import eu.corvus.corax.utils.Logger
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.newSingleThreadContext
 import org.lwjgl.Version
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW.*
@@ -49,7 +45,6 @@ import org.lwjgl.opengl.GL30.GL_TRUE
 import org.lwjgl.system.MemoryStack.stackPush
 import org.lwjgl.system.MemoryUtil.NULL
 import org.lwjgl.system.Platform
-import kotlin.coroutines.CoroutineContext
 
 /**
  * GLFW app for desktop uses

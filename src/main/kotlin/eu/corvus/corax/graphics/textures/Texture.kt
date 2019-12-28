@@ -27,21 +27,23 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.scene
+package eu.corvus.corax.graphics.textures
 
-import eu.corvus.corax.scene.assets.AssetManager
-import eu.corvus.corax.scene.assets.AssetManagerImpl
-import eu.corvus.corax.scene.graph.SceneGraph
-import eu.corvus.corax.scene.graph.SceneGraphImpl
-import eu.corvus.corax.scene.pool.ObjectPool
-import eu.corvus.corax.scene.pool.ObjectPoolImpl
-import org.koin.dsl.module
+import eu.corvus.corax.graphics.context.RendererContext
+import eu.corvus.corax.scene.Object
+import org.koin.core.get
 
 /**
- * @author Vlad Ravenholm on 11/24/2019
+ * @author Vlad Ravenholm on 12/28/2019
  */
-val sceneGraphModules = module {
-    single<AssetManager> { AssetManagerImpl(get()) }
-    single<SceneGraph> { SceneGraphImpl() }
-    single<ObjectPool> { ObjectPoolImpl() }
+abstract class Texture: Object() {
+    open var id: Int = 0
+        protected set
+
+    override fun free() {
+        super.free()
+
+        val renderContext = get<RendererContext>()
+        renderContext.free(this)
+    }
 }

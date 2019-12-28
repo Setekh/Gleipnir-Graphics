@@ -1,13 +1,15 @@
 package eu.corvus.corax.graphics.context
 
 import eu.corvus.corax.graphics.*
-import eu.corvus.corax.graphics.buffers.BufferObject
 import eu.corvus.corax.graphics.buffers.VertexArrayObject
 import eu.corvus.corax.graphics.buffers.VertexBufferObject
 import eu.corvus.corax.graphics.buffers.data
 import eu.corvus.corax.graphics.buffers.types.BufferType
 import eu.corvus.corax.graphics.buffers.types.IndexBuffer
 import eu.corvus.corax.graphics.buffers.types.VertexBuffer
+import eu.corvus.corax.graphics.textures.Texture
+import eu.corvus.corax.scene.Object
+import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL15
 import org.lwjgl.opengl.GL30.*
 import java.nio.FloatBuffer
@@ -86,10 +88,11 @@ class GLFWOpenGLContext : RendererContext {
         //glDisableVertexAttribArray(1)
     }
 
-    override fun free(bufferObject: BufferObject) {
-        when (bufferObject) {
-            is VertexArrayObject -> glDeleteVertexArrays(bufferObject.id)
-            is VertexBufferObject -> glDeleteBuffers(bufferObject.id)
+    override fun free(glObject: Object) {
+        when (glObject) {
+            is VertexArrayObject -> glDeleteVertexArrays(glObject.id)
+            is VertexBufferObject -> glDeleteBuffers(glObject.id)
+            is Texture -> GL11.glDeleteTextures(glObject.id)
         }
     }
 

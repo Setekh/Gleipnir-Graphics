@@ -27,21 +27,12 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.scene
+package eu.corvus.corax.graphics.buffers.types
 
-import eu.corvus.corax.scene.assets.AssetManager
-import eu.corvus.corax.scene.assets.AssetManagerImpl
-import eu.corvus.corax.scene.graph.SceneGraph
-import eu.corvus.corax.scene.graph.SceneGraphImpl
-import eu.corvus.corax.scene.pool.ObjectPool
-import eu.corvus.corax.scene.pool.ObjectPoolImpl
-import org.koin.dsl.module
+import eu.corvus.corax.graphics.buffers.VertexBufferObject
+import org.lwjgl.system.MemoryUtil
 
 /**
- * @author Vlad Ravenholm on 11/24/2019
+ * @author Vlad Ravenholm on 12/21/2019
  */
-val sceneGraphModules = module {
-    single<AssetManager> { AssetManagerImpl(get()) }
-    single<SceneGraph> { SceneGraphImpl() }
-    single<ObjectPool> { ObjectPoolImpl() }
-}
+data class TextureCoordsBuffer(val size: Int): VertexBufferObject(MemoryUtil.memAllocFloat(size), BufferType.TextCoord)
