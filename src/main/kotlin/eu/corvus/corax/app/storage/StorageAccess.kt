@@ -27,35 +27,16 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.app
+package eu.corvus.corax.app.storage
+
+import java.io.InputStream
+import java.io.OutputStream
 
 /**
- * @author Vlad Ravenholm on 11/30/2019
+ * @author Vlad Ravenholm on 12/28/2019
  */
-abstract class Timer {
-    var framePerSecond: Int = 0
-        protected set
-
-    var timePerFrame: Float = 0f
-        protected set
-
-    /**
-     * Current time in ticks
-     */
-    abstract fun getTime(): Long
-
-    /**
-     * Current time in seconds
-     */
-    var timeInSeconds: Long = 0
-        get() = getTime() / resolution
-        private set
-
-    /**
-     * Number of timer ticks per second
-     */
-    abstract val resolution: Long
-    abstract val inverseResolution: Long
-
-    abstract fun tick()
+interface StorageAccess {
+    suspend fun readFrom(path: String, block: (InputStream) -> Unit)
+    suspend fun writeTo(path: String, block: (OutputStream) -> Unit)
+    suspend fun delete(path: String): Boolean
 }

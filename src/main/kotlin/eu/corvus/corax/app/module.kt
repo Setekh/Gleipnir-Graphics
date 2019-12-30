@@ -31,6 +31,8 @@ package eu.corvus.corax.app
 
 import eu.corvus.corax.app.input.AppInput
 import eu.corvus.corax.app.shells.DesktopApp
+import eu.corvus.corax.app.storage.DesktopStorageAccess
+import eu.corvus.corax.app.storage.StorageAccess
 import eu.corvus.corax.app.timers.NanoTimer
 import org.koin.dsl.module
 
@@ -41,6 +43,11 @@ import org.koin.dsl.module
 val appModule = module {
     single<Timer> { NanoTimer() }
     single<Input> { AppInput() }
+
+    single<StorageAccess> {
+        // TODO check for platform
+        DesktopStorageAccess()
+    }
 
     single<GleipnirApplication>(createdAtStart = true) {
         // Here will check the platform and see what type of app to start

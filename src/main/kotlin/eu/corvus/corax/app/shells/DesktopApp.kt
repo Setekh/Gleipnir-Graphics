@@ -32,8 +32,8 @@ package eu.corvus.corax.app.shells
 import eu.corvus.corax.app.GleipnirApplication
 import eu.corvus.corax.app.Input
 import eu.corvus.corax.app.KeyEvent
-import eu.corvus.corax.graphics.Renderer
 import eu.corvus.corax.app.Timer
+import eu.corvus.corax.graphics.Renderer
 import eu.corvus.corax.scene.graph.SceneGraph
 import eu.corvus.corax.utils.Logger
 import org.lwjgl.Version
@@ -61,8 +61,6 @@ class DesktopApp(
 
     init {
         Logger.info("LWJGL ${Version.getVersion()} GLFW ${glfwGetVersionString()}!")
-
-        startLifeCycle()
     }
 
     override fun onCreate() {
@@ -165,7 +163,6 @@ class DesktopApp(
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
         while (!glfwWindowShouldClose(window)) {
-
             update()
 
             glfwSwapBuffers(window) // swap the color buffers

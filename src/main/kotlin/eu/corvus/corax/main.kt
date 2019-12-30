@@ -30,11 +30,15 @@
 @file:JvmName("StartMain")
 package eu.corvus.corax
 
+import eu.corvus.corax.app.GleipnirApplication
 import eu.corvus.corax.app.appModule
 import eu.corvus.corax.graphics.graphicsModule
 import eu.corvus.corax.scene.sceneGraphModules
 import eu.corvus.corax.utils.Logger
 import eu.corvus.corax.utils.SystemConsoleLogger
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.koin.core.context.startKoin
 import org.koin.core.logger.PrintLogger
 
@@ -44,9 +48,11 @@ import org.koin.core.logger.PrintLogger
 fun main(args: Array<String>) {
     startKoin {
         Logger.init(SystemConsoleLogger())
-
         logger(PrintLogger())
         fileProperties("/config.properties")
         modules(appModule + graphicsModule + sceneGraphModules)
+
+        val app = koin.get<GleipnirApplication>()
+        app.startLifeCycle()
     }
 }

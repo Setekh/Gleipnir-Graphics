@@ -29,6 +29,8 @@
  */
 package eu.corvus.corax.scene
 
+import eu.corvus.corax.scene.assets.AssetManager
+import eu.corvus.corax.scene.assets.AssetManagerImpl
 import eu.corvus.corax.scene.graph.SceneGraph
 import eu.corvus.corax.scene.graph.SceneGraphImpl
 import eu.corvus.corax.scene.pool.ObjectPool
@@ -39,6 +41,7 @@ import org.koin.dsl.module
  * @author Vlad Ravenholm on 11/24/2019
  */
 val sceneGraphModules = module {
+    single<AssetManager> { AssetManagerImpl(get()) }
     single<SceneGraph> { SceneGraphImpl() }
     single<ObjectPool> { ObjectPoolImpl() }
 }

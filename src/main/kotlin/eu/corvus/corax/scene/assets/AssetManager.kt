@@ -27,35 +27,27 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.app
+package eu.corvus.corax.scene.assets
+
+import eu.corvus.corax.app.storage.StorageAccess
+import eu.corvus.corax.graphics.textures.Texture
+import eu.corvus.corax.scene.Object
+import eu.corvus.corax.scene.Spatial
 
 /**
- * @author Vlad Ravenholm on 11/30/2019
+ * @author Vlad Ravenholm on 12/28/2019
  */
-abstract class Timer {
-    var framePerSecond: Int = 0
-        protected set
+interface AssetManager {
+    fun addLoader(suffix: String, assetLoader: AssetLoader)
 
-    var timePerFrame: Float = 0f
-        protected set
+    fun removeLoader(suffix: String)
 
-    /**
-     * Current time in ticks
-     */
-    abstract fun getTime(): Long
+    suspend fun loadSpatial(assetName: String): Spatial
+    suspend fun loadTexture(assetName: String): Texture
 
-    /**
-     * Current time in seconds
-     */
-    var timeInSeconds: Long = 0
-        get() = getTime() / resolution
-        private set
+    fun unload(assetName: String)
 
-    /**
-     * Number of timer ticks per second
-     */
-    abstract val resolution: Long
-    abstract val inverseResolution: Long
-
-    abstract fun tick()
+    interface AssetLoader {
+        suspend fun load(assetManager: AssetManager, storageAccess: StorageAccess, path: String): Object
+    }
 }

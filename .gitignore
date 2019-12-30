@@ -1,6 +1,8 @@
 .gradle/
 .idea/
 build/
+test-data
+!src/test/resources/test-data
 
 *.dll
 *.so

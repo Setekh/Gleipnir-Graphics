@@ -27,35 +27,23 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.app
+package eu.corvus.corax.graphics.textures
+
+import eu.corvus.corax.graphics.context.RendererContext
+import eu.corvus.corax.scene.Object
+import org.koin.core.get
 
 /**
- * @author Vlad Ravenholm on 11/30/2019
+ * @author Vlad Ravenholm on 12/28/2019
  */
-abstract class Timer {
-    var framePerSecond: Int = 0
+abstract class Texture: Object() {
+    open var id: Int = 0
         protected set
 
-    var timePerFrame: Float = 0f
-        protected set
+    override fun free() {
+        super.free()
 
-    /**
-     * Current time in ticks
-     */
-    abstract fun getTime(): Long
-
-    /**
-     * Current time in seconds
-     */
-    var timeInSeconds: Long = 0
-        get() = getTime() / resolution
-        private set
-
-    /**
-     * Number of timer ticks per second
-     */
-    abstract val resolution: Long
-    abstract val inverseResolution: Long
-
-    abstract fun tick()
+        val renderContext = get<RendererContext>()
+        renderContext.free(this)
+    }
 }

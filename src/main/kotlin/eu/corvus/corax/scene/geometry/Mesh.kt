@@ -1,11 +1,6 @@
 package eu.corvus.corax.scene.geometry
 
-import eu.corvus.corax.graphics.buffers.types.BufferType
 import eu.corvus.corax.graphics.buffers.VertexArrayObject
-import eu.corvus.corax.graphics.buffers.VertexBufferObject
-import org.lwjgl.opengl.GL30.*
-import java.nio.FloatBuffer
-import java.nio.IntBuffer
 
 /**
  * @author Vlad Ravenholm on 11/24/2019
@@ -17,12 +12,34 @@ import java.nio.IntBuffer
 class Mesh(name: String = "Mesh") : Geometry(name) {
     override var vertexArrayObject: VertexArrayObject? = null
 
-    fun createSimple(vertexArray: FloatArray, indices: IntArray, textCoord: FloatArray = floatArrayOf(0f, 1f)): Mesh {
+    fun createSimple(vertexArray: FloatArray, indices: IntArray, texCoords: FloatArray? = null): Mesh {
         vertexArrayObject = VertexArrayObject().apply {
             addIndexBuffer(indices)
             addVertexBuffer(vertexArray)
+
+            if (texCoords != null)
+                addTextureCoordsBuffer(texCoords)
         }
 
         return this
+    }
+
+    fun createMesh(vertexArray: FloatArray, indices: IntArray, texCoords: FloatArray?, normals: FloatArray?, tangents: FloatArray?, biTangents: FloatArray?) {
+        vertexArrayObject = VertexArrayObject().apply {
+            addIndexBuffer(indices)
+            addVertexBuffer(vertexArray)
+
+            if (texCoords != null)
+                addTextureCoordsBuffer(texCoords)
+
+            if (normals != null)
+                addNormalsBuffer(normals)
+
+            if (tangents != null)
+                addTangentsBuffer(tangents)
+
+            if (biTangents != null)
+                addBiTangentsBuffer(biTangents)
+        }
     }
 }

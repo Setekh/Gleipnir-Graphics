@@ -31,8 +31,11 @@ package eu.corvus.corax.graphics.buffers.types
 
 import eu.corvus.corax.graphics.buffers.VertexBufferObject
 import org.lwjgl.system.MemoryUtil
+import java.nio.FloatBuffer
 
 /**
  * @author Vlad Ravenholm on 12/21/2019
  */
 data class VertexBuffer(val size: Int): VertexBufferObject(MemoryUtil.memAllocFloat(size), BufferType.Vertex)
+
+fun VertexBuffer.data(): FloatBuffer? = buffer as FloatBuffer?

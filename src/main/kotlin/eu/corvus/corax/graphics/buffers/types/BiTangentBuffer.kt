@@ -27,35 +27,15 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.app
+package eu.corvus.corax.graphics.buffers.types
+
+import eu.corvus.corax.graphics.buffers.VertexBufferObject
+import org.lwjgl.system.MemoryUtil
+import java.nio.FloatBuffer
 
 /**
- * @author Vlad Ravenholm on 11/30/2019
+ * @author Vlad Ravenholm on 12/21/2019
  */
-abstract class Timer {
-    var framePerSecond: Int = 0
-        protected set
+data class BiTangentBuffer(val size: Int): VertexBufferObject(MemoryUtil.memAllocFloat(size), BufferType.BiTangents)
 
-    var timePerFrame: Float = 0f
-        protected set
-
-    /**
-     * Current time in ticks
-     */
-    abstract fun getTime(): Long
-
-    /**
-     * Current time in seconds
-     */
-    var timeInSeconds: Long = 0
-        get() = getTime() / resolution
-        private set
-
-    /**
-     * Number of timer ticks per second
-     */
-    abstract val resolution: Long
-    abstract val inverseResolution: Long
-
-    abstract fun tick()
-}
+fun BiTangentBuffer.data(): FloatBuffer? = buffer as FloatBuffer?
