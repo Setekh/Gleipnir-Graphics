@@ -3,10 +3,7 @@ package eu.corvus.corax.graphics.context
 import eu.corvus.corax.graphics.*
 import eu.corvus.corax.graphics.buffers.VertexArrayObject
 import eu.corvus.corax.graphics.buffers.VertexBufferObject
-import eu.corvus.corax.graphics.buffers.data
-import eu.corvus.corax.graphics.buffers.types.BufferType
-import eu.corvus.corax.graphics.buffers.types.IndexBuffer
-import eu.corvus.corax.graphics.buffers.types.VertexBuffer
+import eu.corvus.corax.graphics.buffers.types.*
 import eu.corvus.corax.graphics.textures.Texture
 import eu.corvus.corax.scene.Object
 import org.lwjgl.opengl.GL11
@@ -54,7 +51,10 @@ class GLFWOpenGLContext : RendererContext {
 
             bufferObject.onAssign(id)
             when (bufferObject) {
-                is VertexBuffer -> createVertexBufferData(bufferObject)
+                is VertexBuffer, is TextureCoordsBuffer, is NormalBuffer, is TangentBuffer, is BiTangentBuffer -> createFloatBufferData(
+                    bufferObject.type.ordinal,
+                    bufferObject
+                )
                 is IndexBuffer -> createIndexBufferData(bufferObject)
             }
             bufferObject.clearData()
@@ -69,23 +69,21 @@ class GLFWOpenGLContext : RendererContext {
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, data as IntBuffer, GL_STATIC_DRAW)
     }
 
-    private fun createVertexBufferData(bufferObject: VertexBuffer) {
-        val data = bufferObject.data()
+    private fun createFloatBufferData(index: Int, bufferObject: VertexBufferObject) {
+        val data = bufferObject.buffer
 
         bindBufferObject(bufferObject)
         glBufferData(GL_ARRAY_BUFFER, data as FloatBuffer, GL_STATIC_DRAW)
-        glVertexAttribPointer(0, bufferObject.type.size, GL_FLOAT, false, 0, 0)
+        glVertexAttribPointer(index, bufferObject.type.size, GL_FLOAT, false, 0, 0)
     }
 
     override fun draw(vertexArrayObject: VertexArrayObject) {
         // Render the vertex buffer
-        glEnableVertexAttribArray(0) // TODO this should be in a material
-        //glEnableVertexAttribArray(1)
+        vertexArrayObject.vertexBuffers.forEach { // maybe make it more efficient?
+            it?.let { glEnableVertexAttribArray(it.type.ordinal) }
+        }
 
         glDrawElements(GL_TRIANGLES, vertexArrayObject.size, GL_UNSIGNED_INT, 0)
-
-        glDisableVertexAttribArray(0)
-        //glDisableVertexAttribArray(1)
     }
 
     override fun free(glObject: Object) {
@@ -99,8 +97,11 @@ class GLFWOpenGLContext : RendererContext {
     private fun targetBufferType(vertexBufferObject: VertexBufferObject): Int {
         return when (vertexBufferObject.type) {
             BufferType.Vertex -> GL15.GL_ARRAY_BUFFER
+            BufferType.TextCoord -> GL15.GL_ARRAY_BUFFER
+            BufferType.Normals -> GL15.GL_ARRAY_BUFFER
+            BufferType.Tangents -> GL15.GL_ARRAY_BUFFER
+            BufferType.BiTangents -> GL15.GL_ARRAY_BUFFER
             BufferType.Indices -> GL15.GL_ELEMENT_ARRAY_BUFFER
-            else -> error("Unknown buffer type! ${vertexBufferObject.type}")
         }
     }
 }

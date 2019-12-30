@@ -31,8 +31,11 @@ package eu.corvus.corax.graphics.buffers.types
 
 import eu.corvus.corax.graphics.buffers.VertexBufferObject
 import org.lwjgl.system.MemoryUtil
+import java.nio.IntBuffer
 
 /**
  * @author Vlad Ravenholm on 12/21/2019
  */
 data class IndexBuffer(val size: Int): VertexBufferObject(MemoryUtil.memAllocInt(size), BufferType.Indices)
+
+fun IndexBuffer.data(): IntBuffer? = buffer as IntBuffer?

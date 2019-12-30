@@ -38,17 +38,17 @@ import eu.corvus.corax.scene.Camera
 import eu.corvus.corax.scene.assets.AssetManager
 import eu.corvus.corax.scene.geometry.Geometry
 import eu.corvus.corax.scene.geometry.Mesh
+import eu.corvus.corax.utils.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.joml.Math.toRadians
 import org.joml.Matrix4f
-import org.koin.core.Koin
+import org.joml.Vector3f
 import org.koin.core.context.GlobalContext
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.opengl.GL30.*
-import javax.xml.bind.JAXBElement
 
 /**
  * @author Vlad Ravenholm on 11/24/2019
@@ -66,6 +66,14 @@ class DummyRenderer(
     private val viewPortColor = Color.of(0.13f, 0.13f, 0.13f)
 
     private val worldMatrix = Matrix4f()
+
+
+    private val speed = 6f
+
+    private var forward = false
+    private var backward = false
+    private var left = false
+    private var right = false
 
     val shader: ShaderProgram by lazy {
         val shaderProgram = ShaderProgram()
@@ -115,8 +123,8 @@ class DummyRenderer(
         val assetManager = koin.get<AssetManager>()
 
         GlobalScope.launch {
-            val spatial = assetManager.loadSpatial("test-data/test/obj/blobby.obj")
-            withContext(Dispatchers.Unconfined) {
+            val spatial = assetManager.loadSpatial("test-data/test/fbx/suz.dae")
+            withContext(Dispatchers.Default) {
                 geoms.add(spatial.children.first() as Geometry)
             }
         }
@@ -132,7 +140,10 @@ class DummyRenderer(
         //glEnable(GL_CULL_FACE)
         //glCullFace(GL_BACK)
 
-        shader.createUniform("worldViewProjectionMatrix")
+        shader.createUniform("viewProjectionMatrix")
+        shader.createUniform("viewMatrix")
+        shader.createUniform("modelMatrix")
+        shader.createUniform("eye")
         shader.createUniform("inf")
 
         input.map(Device.Keyboard, GLFW.GLFW_KEY_LEFT, "rotate-") { _, status ->
@@ -151,30 +162,19 @@ class DummyRenderer(
 
 
         input.map(Device.Keyboard, GLFW.GLFW_KEY_W, "forward") { _, status ->
-            if (status == KeyEvent.Pressed) {
-                camera.transform.translation.z += .6f
-                camera.forceUpdate()
-            }
+            forward = status == KeyEvent.Pressed
         }
 
         input.map(Device.Keyboard, GLFW.GLFW_KEY_S, "forward-") { _, status ->
-            if (status == KeyEvent.Pressed) {
-                camera.transform.translation.z -= .6f
-                camera.forceUpdate()
-            }
+            backward = status == KeyEvent.Pressed
         }
+
         input.map(Device.Keyboard, GLFW.GLFW_KEY_A, "left-s") { _, status ->
-            if (status == KeyEvent.Pressed) {
-                camera.transform.translation.x += .6f
-                camera.forceUpdate()
-            }
+            left = status == KeyEvent.Pressed
         }
 
         input.map(Device.Keyboard, GLFW.GLFW_KEY_D, "left-s-") { _, status ->
-            if (status == KeyEvent.Pressed) {
-                camera.transform.translation.x -= .6f
-                camera.forceUpdate()
-            }
+            right = status == KeyEvent.Pressed
         }
     }
 
@@ -187,6 +187,22 @@ class DummyRenderer(
     }
 
     override fun onPreRender(tpf: Float) {
+
+        val direction = Vector3f()
+
+        val isMoving = forward || backward || left || right
+
+        val viewMatrix = camera.viewMatrix
+        if (forward) direction.add(viewMatrix.getColumn(2, Vector3f()))
+        if (backward) direction.add(viewMatrix.getColumn(2, Vector3f()).negate())
+        if (left) direction.add(viewMatrix.getColumn(0, Vector3f()))
+        if (right) direction.add(viewMatrix.getColumn(0, Vector3f()).negate())
+
+        if (isMoving) {
+            camera.transform.translation.add(direction.mul(speed * tpf))
+            camera.forceUpdate()
+        }
+
         geoms.forEach {
             it.vertexArrayObject?.let { vao ->
                 if (!vao.isUploaded())
@@ -203,14 +219,20 @@ class DummyRenderer(
 
         shader.bind() // This should be in a material?
 
-        geoms.forEach {
-            val vertexArrayObject = it.vertexArrayObject ?: return@forEach
+        repeat(geoms.size) { index ->
+            val geometry = geoms[index]
+            val vertexArrayObject = geometry.vertexArrayObject ?: return@repeat
 
             shader.setUniform(
-                "worldViewProjectionMatrix",
-                worldMatrix.set(camera.viewProjectionMatrix).mul(it.worldMatrix)
+                "viewProjectionMatrix",
+                worldMatrix.set(camera.viewProjectionMatrix)
             )
-            shader.setUniform("inf", if (it.name != "Quad") 0.3f else 0.5f)
+
+            shader.setUniform("viewMatrix", camera.viewMatrix)
+            shader.setUniform("modelMatrix", geometry.worldMatrix)
+            shader.setUniform("eye", camera.worldTransform.translation)
+            shader.setUniform("inf", if (geometry.name != "Quad") 0.3f else 0.5f)
+
 
             rendererContext.bindBufferArray(vertexArrayObject)
             rendererContext.draw(vertexArrayObject)

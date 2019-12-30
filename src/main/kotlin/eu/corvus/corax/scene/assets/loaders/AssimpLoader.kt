@@ -35,36 +35,40 @@ import eu.corvus.corax.scene.Spatial
 import eu.corvus.corax.scene.assets.AssetManager
 import eu.corvus.corax.scene.geometry.Mesh
 import org.lwjgl.assimp.AIMesh
-import org.lwjgl.assimp.Assimp
 import org.lwjgl.assimp.Assimp.*
 import org.lwjgl.system.MemoryUtil
 
 /**
  * @author Vlad Ravenholm on 12/28/2019
  */
-class AssimpObjLoader : AssetManager.AssetLoader {
+class AssimpLoader : AssetManager.AssetLoader {
     override suspend fun load(assetManager: AssetManager, storageAccess: StorageAccess, path: String): Object {
         val spatial = Spatial(path)
         storageAccess.readFrom(path) {
             val alloc = MemoryUtil.memAlloc(it.available())
             alloc.put(it.readBytes()).flip()
 
-            val aiScene = Assimp.aiImportFileFromMemory(alloc,
-                aiProcess_JoinIdenticalVertices or aiProcess_Triangulate or aiProcess_FixInfacingNormals or aiProcess_CalcTangentSpace, "obj") ?: error("Failed loading asset $path!")
+            val suffix = path.substringAfterLast('.')
+            val aiScene = aiImportFileFromMemory(alloc,
+                aiProcess_JoinIdenticalVertices or aiProcess_Triangulate or aiProcess_FixInfacingNormals or aiProcess_CalcTangentSpace,
+                suffix
+            ) ?: error("Failed loading asset $path!")
+
 
             val numMeshes = aiScene.mNumMeshes()
             val aiMeshes = aiScene.mMeshes()!!
             repeat(numMeshes) { index ->
                 val aiMesh = AIMesh.create(aiMeshes.get(index))
+                aiMesh.mBones()
                 val vertexes = aiMesh.getVertices()
                 val texCoords = aiMesh.getTexCoords()
-//                val normals = aiMesh.getVertices()
-//                val tangents = aiMesh.getTangents()
-//                val bitangents = aiMesh.getBitangents()
+                val normals = aiMesh.getNormals()
+                val tangents = aiMesh.getTangents()
+                val bitangents = aiMesh.getBitangents()
                 val indices = aiMesh.getIndices()
 
                 val geometry = Mesh(aiMesh.mName().dataString())
-                geometry.createSimple(vertexes, indices, texCoords)
+                geometry.createMesh(vertexes, indices, texCoords, normals, tangents, bitangents)
                 geometry.forceUpdate()
                 spatial.appendChild(geometry)
             }
@@ -73,3 +77,19 @@ class AssimpObjLoader : AssetManager.AssetLoader {
         return spatial
     }
 }
+
+fun AIMesh.getVertices(): FloatArray = mVertices().map { listOf(it.x(), it.y(), it.z()) }.flatten().toFloatArray()
+fun AIMesh.getTexCoords(): FloatArray? = mTextureCoords(0)?.map { listOf(it.x(), it.y()) }?.flatten()?.toFloatArray()
+
+fun AIMesh.getNormals(): FloatArray? = mNormals()?.map { listOf(it.x(), it.y(), it.z()) }?.flatten()?.toFloatArray()
+fun AIMesh.getTangents(): FloatArray? = mTangents()?.map { listOf(it.x(), it.y(), it.z()) }?.flatten()?.toFloatArray()
+fun AIMesh.getBitangents(): FloatArray? = mBitangents()?.map { listOf(it.x(), it.y(), it.z()) }?.flatten()?.toFloatArray()
+
+fun AIMesh.getIndices(): IntArray = mFaces().map {
+    val collect = mutableListOf<Int>()
+    val mIndices = it.mIndices()
+    while (mIndices.remaining() > 0)
+        collect.add(mIndices.get())
+
+    collect
+}.flatten().toIntArray()

@@ -29,10 +29,7 @@
  */
 package eu.corvus.corax.graphics.buffers
 
-import eu.corvus.corax.graphics.buffers.types.BufferType
-import eu.corvus.corax.graphics.buffers.types.IndexBuffer
-import eu.corvus.corax.graphics.buffers.types.TextureCoordsBuffer
-import eu.corvus.corax.graphics.buffers.types.VertexBuffer
+import eu.corvus.corax.graphics.buffers.types.*
 
 /**
  * @author Vlad Ravenholm on 11/24/2019
@@ -64,10 +61,20 @@ class VertexArrayObject(
         addBuffer(vertexBuffer)
     }
 
-    fun addTextureCoords(texCoords: FloatArray) {
-        val textureCoordsBuffer = TextureCoordsBuffer(texCoords.size)
-        textureCoordsBuffer.data()!!.put(texCoords).flip()
-        addBuffer(textureCoordsBuffer)
+    fun addTextureCoordsBuffer(texCoords: FloatArray) {
+        addBuffer(TextureCoordsBuffer(texCoords.size).apply { data()!!.put(texCoords).flip() })
+    }
+
+    fun addNormalsBuffer(normals: FloatArray) {
+        addBuffer(NormalBuffer(normals.size).apply { data()!!.put(normals).flip() })
+    }
+
+    fun addTangentsBuffer(tangents: FloatArray) {
+        addBuffer(NormalBuffer(tangents.size).apply { data()!!.put(tangents).flip() })
+    }
+
+    fun addBiTangentsBuffer(biTangents: FloatArray) {
+        addBuffer(NormalBuffer(biTangents.size).apply { data()!!.put(biTangents).flip() })
     }
 
     private fun addBuffer(vertexBuffer: VertexBufferObject) {

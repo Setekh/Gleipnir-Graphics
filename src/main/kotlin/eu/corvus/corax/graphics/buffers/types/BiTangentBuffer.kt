@@ -27,26 +27,15 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.scene.assets.loaders
+package eu.corvus.corax.graphics.buffers.types
 
-import org.lwjgl.assimp.AIMesh
+import eu.corvus.corax.graphics.buffers.VertexBufferObject
+import org.lwjgl.system.MemoryUtil
+import java.nio.FloatBuffer
 
 /**
- * @author Vlad Ravenholm on 12/28/2019
+ * @author Vlad Ravenholm on 12/21/2019
  */
+data class BiTangentBuffer(val size: Int): VertexBufferObject(MemoryUtil.memAllocFloat(size), BufferType.BiTangents)
 
-fun AIMesh.getVertices(): FloatArray = mVertices().map { listOf(it.x(), it.y(), it.z()) }.flatten().toFloatArray()
-fun AIMesh.getTexCoords(): FloatArray? = mTextureCoords(0)?.map { listOf(it.x(), it.y()) }?.flatten()?.toFloatArray()
-
-fun AIMesh.getNormals(): FloatArray? = mNormals()?.map { listOf(it.x(), it.y(), it.z()) }?.flatten()?.toFloatArray()
-fun AIMesh.getTangents(): FloatArray? = mTangents()?.map { listOf(it.x(), it.y(), it.z()) }?.flatten()?.toFloatArray()
-fun AIMesh.getBitangents(): FloatArray? = mBitangents()?.map { listOf(it.x(), it.y(), it.z()) }?.flatten()?.toFloatArray()
-
-fun AIMesh.getIndices(): IntArray = mFaces().map {
-    val collect = mutableListOf<Int>()
-    val mIndices = it.mIndices()
-    while (mIndices.remaining() > 0)
-        collect.add(mIndices.get())
-
-    collect
-}.flatten().toIntArray()
+fun BiTangentBuffer.data(): FloatBuffer? = buffer as FloatBuffer?

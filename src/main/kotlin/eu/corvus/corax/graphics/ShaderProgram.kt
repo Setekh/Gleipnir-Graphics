@@ -1,10 +1,12 @@
 package eu.corvus.corax.graphics
 
 import eu.corvus.corax.scene.Object
+import eu.corvus.corax.utils.Logger
 import org.lwjgl.opengl.GL20.*
 import java.nio.FloatBuffer
 import org.lwjgl.system.MemoryStack
 import org.joml.Matrix4f
+import org.joml.Vector3f
 import org.lwjgl.opengl.GL20
 import java.util.HashMap
 
@@ -30,7 +32,7 @@ class ShaderProgram: Object() {
     fun createUniform(uniformName: String) {
         val uniformLocation = glGetUniformLocation(programId, uniformName)
         if (uniformLocation < 0) {
-            throw Exception("Could not find uniform:$uniformName")
+            Logger.warn("Could not find uniform:$uniformName")
         }
 
         uniforms[uniformName] = uniformLocation
@@ -54,6 +56,11 @@ class ShaderProgram: Object() {
     fun setUniform(uniformName: String, value: Float) {
         val uniform = uniforms[uniformName] ?: return
         glUniform1f(uniform, value)
+    }
+
+    fun setUniform(uniformName: String, vector3f: Vector3f) {
+        val uniform = uniforms[uniformName] ?: return
+        glUniform3f(uniform, vector3f.x, vector3f.y, vector3f.z)
     }
 
     fun createVertexShader(shaderCode: String) {
@@ -115,4 +122,5 @@ class ShaderProgram: Object() {
             glDeleteProgram(programId)
         }
     }
+
 }

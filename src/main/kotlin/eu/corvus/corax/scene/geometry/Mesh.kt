@@ -18,9 +18,28 @@ class Mesh(name: String = "Mesh") : Geometry(name) {
             addVertexBuffer(vertexArray)
 
             if (texCoords != null)
-                addTextureCoords(texCoords)
+                addTextureCoordsBuffer(texCoords)
         }
 
         return this
+    }
+
+    fun createMesh(vertexArray: FloatArray, indices: IntArray, texCoords: FloatArray?, normals: FloatArray?, tangents: FloatArray?, biTangents: FloatArray?) {
+        vertexArrayObject = VertexArrayObject().apply {
+            addIndexBuffer(indices)
+            addVertexBuffer(vertexArray)
+
+            if (texCoords != null)
+                addTextureCoordsBuffer(texCoords)
+
+            if (normals != null)
+                addNormalsBuffer(normals)
+
+            if (tangents != null)
+                addTangentsBuffer(tangents)
+
+            if (biTangents != null)
+                addBiTangentsBuffer(biTangents)
+        }
     }
 }
