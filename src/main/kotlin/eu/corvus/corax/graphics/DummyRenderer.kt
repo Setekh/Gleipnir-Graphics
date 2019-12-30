@@ -123,7 +123,7 @@ class DummyRenderer(
         val assetManager = koin.get<AssetManager>()
 
         GlobalScope.launch {
-            val spatial = assetManager.loadSpatial("test-data/test/fbx/suz.dae")
+            val spatial = assetManager.loadSpatial("test-models//suz.dae")
             withContext(Dispatchers.Default) {
                 geoms.add(spatial.children.first() as Geometry)
             }
