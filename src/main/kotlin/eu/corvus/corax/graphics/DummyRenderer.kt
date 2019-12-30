@@ -38,10 +38,7 @@ import eu.corvus.corax.scene.Camera
 import eu.corvus.corax.scene.assets.AssetManager
 import eu.corvus.corax.scene.geometry.Geometry
 import eu.corvus.corax.scene.geometry.Mesh
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.joml.Math.toRadians
 import org.joml.Vector3f
 import org.koin.core.context.GlobalContext
@@ -119,7 +116,7 @@ class DummyRenderer(
 
         GlobalScope.launch {
             val spatial = assetManager.loadSpatial("test-models//suz.dae")
-            withContext(Dispatchers.Default) {
+            withContext(Dispatchers.Main) {
                 geoms.add(spatial.children.first() as Geometry)
             }
         }
@@ -213,9 +210,8 @@ class DummyRenderer(
 
         shader.bind() // This should be in a material?
 
-        repeat(geoms.size) { index ->
-            val geometry = geoms[index]
-            val vertexArrayObject = geometry.vertexArrayObject ?: return@repeat
+        geoms.forEach {geometry ->
+            val vertexArrayObject = geometry.vertexArrayObject ?: return@forEach
 
             shader.setUniform("viewProjectionMatrix", camera.viewProjectionMatrix)
             shader.setUniform("viewMatrix", camera.viewMatrix)

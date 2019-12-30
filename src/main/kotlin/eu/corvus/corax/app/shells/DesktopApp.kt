@@ -61,8 +61,6 @@ class DesktopApp(
 
     init {
         Logger.info("LWJGL ${Version.getVersion()} GLFW ${glfwGetVersionString()}!")
-
-        startLifeCycle()
     }
 
     override fun onCreate() {

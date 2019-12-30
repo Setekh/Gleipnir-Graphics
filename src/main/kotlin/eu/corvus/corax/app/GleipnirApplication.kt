@@ -32,6 +32,7 @@ package eu.corvus.corax.app
 import eu.corvus.corax.scene.graph.SceneGraph
 import eu.corvus.corax.utils.Logger
 import org.koin.core.KoinComponent
+import java.util.*
 
 /**
  * @author Vlad Ravenholm on 11/24/2019
@@ -41,6 +42,8 @@ abstract class GleipnirApplication(
     var timer: Timer,
     var sceneGraph: SceneGraph
 ): KoinComponent {
+    private val enqueuedTasks = LinkedList<Runnable>()
+
     var width: Int = 640
         private set
     var height: Int = 480
@@ -70,6 +73,9 @@ abstract class GleipnirApplication(
             Logger.info("FPS: ${timer.framePerSecond}")
         }
 
+        processEnqueuedTasks()
+
+
         if(speed == 0f || paused)
             return
 
@@ -77,6 +83,17 @@ abstract class GleipnirApplication(
 
         val tpf = timer.timePerFrame * speed
         onUpdate(tpf)
+    }
+
+    private fun processEnqueuedTasks() {
+        while (enqueuedTasks.isNotEmpty()) {
+            val task = enqueuedTasks.pop()
+            val result = kotlin.runCatching { task.run() }
+
+            if (result.isFailure) {
+                Logger.error(result.exceptionOrNull(), "Failed enqueued task!")
+            }
+        }
     }
 
     open fun onUpdate(tpf: Float)  = Unit
@@ -92,6 +109,10 @@ abstract class GleipnirApplication(
         } finally {
             onDestroy()
         }
+    }
+
+    fun dispatch(block: Runnable) {
+        enqueuedTasks.addLast(block)
     }
 
 }
