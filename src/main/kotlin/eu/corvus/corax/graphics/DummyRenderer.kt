@@ -38,13 +38,11 @@ import eu.corvus.corax.scene.Camera
 import eu.corvus.corax.scene.assets.AssetManager
 import eu.corvus.corax.scene.geometry.Geometry
 import eu.corvus.corax.scene.geometry.Mesh
-import eu.corvus.corax.utils.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.joml.Math.toRadians
-import org.joml.Matrix4f
 import org.joml.Vector3f
 import org.koin.core.context.GlobalContext
 import org.lwjgl.glfw.GLFW
@@ -64,9 +62,6 @@ class DummyRenderer(
     val geoms = arrayListOf<Geometry>()
     private val camera: Camera = Camera()
     private val viewPortColor = Color.of(0.13f, 0.13f, 0.13f)
-
-    private val worldMatrix = Matrix4f()
-
 
     private val speed = 6f
 
@@ -187,7 +182,6 @@ class DummyRenderer(
     }
 
     override fun onPreRender(tpf: Float) {
-
         val direction = Vector3f()
 
         val isMoving = forward || backward || left || right
@@ -223,11 +217,7 @@ class DummyRenderer(
             val geometry = geoms[index]
             val vertexArrayObject = geometry.vertexArrayObject ?: return@repeat
 
-            shader.setUniform(
-                "viewProjectionMatrix",
-                worldMatrix.set(camera.viewProjectionMatrix)
-            )
-
+            shader.setUniform("viewProjectionMatrix", camera.viewProjectionMatrix)
             shader.setUniform("viewMatrix", camera.viewMatrix)
             shader.setUniform("modelMatrix", geometry.worldMatrix)
             shader.setUniform("eye", camera.worldTransform.translation)
@@ -236,7 +226,6 @@ class DummyRenderer(
 
             rendererContext.bindBufferArray(vertexArrayObject)
             rendererContext.draw(vertexArrayObject)
-            rendererContext.unbindBufferArray(vertexArrayObject)
         }
 
         shader.unbind()

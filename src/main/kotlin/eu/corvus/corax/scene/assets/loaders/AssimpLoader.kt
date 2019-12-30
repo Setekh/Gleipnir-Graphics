@@ -59,7 +59,6 @@ class AssimpLoader : AssetManager.AssetLoader {
             val aiMeshes = aiScene.mMeshes()!!
             repeat(numMeshes) { index ->
                 val aiMesh = AIMesh.create(aiMeshes.get(index))
-                aiMesh.mBones()
                 val vertexes = aiMesh.getVertices()
                 val texCoords = aiMesh.getTexCoords()
                 val normals = aiMesh.getNormals()

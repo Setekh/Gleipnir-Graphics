@@ -70,11 +70,11 @@ class VertexArrayObject(
     }
 
     fun addTangentsBuffer(tangents: FloatArray) {
-        addBuffer(NormalBuffer(tangents.size).apply { data()!!.put(tangents).flip() })
+        addBuffer(TangentBuffer(tangents.size).apply { data()!!.put(tangents).flip() })
     }
 
     fun addBiTangentsBuffer(biTangents: FloatArray) {
-        addBuffer(NormalBuffer(biTangents.size).apply { data()!!.put(biTangents).flip() })
+        addBuffer(BiTangentBuffer(biTangents.size).apply { data()!!.put(biTangents).flip() })
     }
 
     private fun addBuffer(vertexBuffer: VertexBufferObject) {

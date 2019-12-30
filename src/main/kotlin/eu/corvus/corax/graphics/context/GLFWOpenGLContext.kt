@@ -59,8 +59,6 @@ class GLFWOpenGLContext : RendererContext {
             }
             bufferObject.clearData()
         }
-
-        unbindBufferArray(vertexArrayObject)
     }
 
     private fun createIndexBufferData(bufferObject: IndexBuffer) {
@@ -80,7 +78,9 @@ class GLFWOpenGLContext : RendererContext {
     override fun draw(vertexArrayObject: VertexArrayObject) {
         // Render the vertex buffer
         vertexArrayObject.vertexBuffers.forEach { // maybe make it more efficient?
-            it?.let { glEnableVertexAttribArray(it.type.ordinal) }
+            if (it != null && it !is IndexBuffer){
+                glEnableVertexAttribArray(it.type.ordinal)
+            }
         }
 
         glDrawElements(GL_TRIANGLES, vertexArrayObject.size, GL_UNSIGNED_INT, 0)
