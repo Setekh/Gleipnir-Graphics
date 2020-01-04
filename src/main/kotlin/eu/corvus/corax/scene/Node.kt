@@ -9,7 +9,7 @@ package eu.corvus.corax.scene
  * @author Vlad Ravenholm on 11/24/2019
  */
 open class Node(var name: String = "Node"): Object() {
-    val children: List<Node> = mutableListOf()
+    val children: List<Node> = arrayListOf()
     private val mChildren = children as MutableList
 
     var parent: Node? = null
@@ -22,5 +22,14 @@ open class Node(var name: String = "Node"): Object() {
     open fun removeChild(child: Node) {
         mChildren.remove(child)
         child.parent = null
+    }
+
+    open fun child(index: Int): Node {
+        val list = mChildren as ArrayList
+        return list[index]
+    }
+
+    fun removeChildren() {
+        mChildren.clear()
     }
 }

@@ -4,7 +4,7 @@ import eu.corvus.corax.graphics.*
 import eu.corvus.corax.graphics.buffers.VertexArrayObject
 import eu.corvus.corax.graphics.buffers.VertexBufferObject
 import eu.corvus.corax.graphics.buffers.types.*
-import eu.corvus.corax.graphics.textures.Texture
+import eu.corvus.corax.graphics.material.textures.Texture
 import eu.corvus.corax.scene.Object
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL15

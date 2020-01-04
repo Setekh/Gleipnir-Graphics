@@ -36,9 +36,6 @@ import eu.corvus.corax.graphics.graphicsModule
 import eu.corvus.corax.scene.sceneGraphModules
 import eu.corvus.corax.utils.Logger
 import eu.corvus.corax.utils.SystemConsoleLogger
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.koin.core.context.startKoin
 import org.koin.core.logger.PrintLogger
 

@@ -30,7 +30,7 @@
 package eu.corvus.corax.scene.assets
 
 import eu.corvus.corax.app.storage.StorageAccess
-import eu.corvus.corax.graphics.textures.Texture
+import eu.corvus.corax.graphics.material.textures.Texture
 import eu.corvus.corax.scene.Object
 import eu.corvus.corax.scene.Spatial
 

@@ -27,25 +27,24 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.app
+package eu.corvus.corax.scene
 
 /**
- * @author Vlad Ravenholm on 11/30/2019
+ * @author Vlad Ravenholm on 1/4/2020
  */
-interface Input {
-    fun map(device: Device, target: Int, mapping: String, action: InputAction)
-    fun remove(mapping: String)
 
-    /**
-     * Usually available on desktop, so no need to map keys to any other device or map GLFW to anything else
-     */
-    fun keyPress(key: Int, event: InputEvent)
+fun Node.findAllCameras(): List<Camera> {
+    val collect = arrayListOf<Camera>()
 
-    fun mousePress(button: Int, event: InputEvent)
-    fun mouseMotion(width: Int, height: Int, xpos: Float, ypos: Float)
+    repeat(children.size) {
+        val child = child(it)
+
+        if (child is Camera) {
+            collect.add(child)
+        }
+
+        collect.addAll(child.findAllCameras())
+    }
+
+    return collect
 }
-
-enum class InputEvent { Pressed, Released, Repeat, Motion }
-
-enum class Device { Keyboard, Mouse, Controller }
-typealias InputAction = (mapping: String, status: InputEvent) -> Unit

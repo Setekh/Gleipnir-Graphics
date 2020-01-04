@@ -27,23 +27,66 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.graphics.textures
-
-import eu.corvus.corax.graphics.context.RendererContext
-import eu.corvus.corax.scene.Object
-import org.koin.core.get
+package eu.corvus.corax.utils
 
 /**
- * @author Vlad Ravenholm on 12/28/2019
+ * @author Vlad Ravenholm on 1/3/2020
  */
-abstract class Texture: Object() {
-    open var id: Int = 0
-        protected set
+class ItemBuffer<E> {
+    companion object {
+        const val MIN_ARRAY_SIZE = 4
+        const val MAX_ARRAY_SIZE = Int.MAX_VALUE
+    }
 
-    override fun free() {
-        super.free()
+    private var elements: Array<Any?> = Array(MIN_ARRAY_SIZE) { null }
 
-        val renderContext = get<RendererContext>()
-        renderContext.free(this)
+    var index = 0
+        private set
+
+    var limit = 0
+        private set
+
+    var capacity = MIN_ARRAY_SIZE
+        private set
+
+    fun put(element: E): ItemBuffer<E> {
+        ensureCapacity(index + 1)
+
+        elements[index++] = element
+
+        return this
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun get(): E = elements[index++] as E
+
+    fun flip(): ItemBuffer<E> {
+        limit = index
+        index = 0
+
+        for(i in limit until capacity) {
+            elements[i] = null
+        }
+
+        return this
+    }
+
+    private fun ensureCapacity(size: Int) {
+        if (size > elements.size) {
+            val oldCapacity = capacity
+            val newCapacity = oldCapacity + (oldCapacity shr 1)
+
+            val newElementsArray = Array<Any?>(newCapacity) { null }
+            System.arraycopy(elements, 0, newElementsArray, 0, capacity)
+            elements = newElementsArray
+
+            capacity = newCapacity
+        }
+    }
+
+    fun clear() {
+        index = 0
+        limit = 0
     }
 }
+

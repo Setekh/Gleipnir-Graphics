@@ -31,11 +31,10 @@ package eu.corvus.corax.app.shells
 
 import eu.corvus.corax.app.GleipnirApplication
 import eu.corvus.corax.app.Input
-import eu.corvus.corax.app.KeyEvent
-import eu.corvus.corax.app.Timer
-import eu.corvus.corax.graphics.Renderer
+import eu.corvus.corax.app.InputEvent
 import eu.corvus.corax.scene.graph.SceneGraph
 import eu.corvus.corax.utils.Logger
+import org.koin.core.inject
 import org.lwjgl.Version
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW.*
@@ -51,11 +50,8 @@ import org.lwjgl.system.Platform
  */
 class DesktopApp(
     title: String = "App Window",
-    timer: Timer,
-    sceneGraph: SceneGraph,
-    private val input: Input,
-    private val renderer: Renderer
-    ): GleipnirApplication(title, timer, sceneGraph) {
+    private val input: Input
+    ): GleipnirApplication(title) {
     // The window handle
     private var window: Long = 0
 
@@ -101,11 +97,19 @@ class DesktopApp(
                 glfwSetWindowShouldClose(window, true) // We will detect this in the rendering loop
 
             input.keyPress(key, when(action) {
-                GLFW_PRESS -> KeyEvent.Pressed
-                GLFW_RELEASE -> KeyEvent.Released
-                GLFW_REPEAT -> KeyEvent.Repeat
+                GLFW_PRESS -> InputEvent.Pressed
+                GLFW_RELEASE -> InputEvent.Released
+                GLFW_REPEAT -> InputEvent.Repeat
                 else -> error("Unk action! $action")
             })
+        }
+
+        glfwSetMouseButtonCallback(window) { window, button, action, mods ->
+            input.mousePress(button, if (action > 0) InputEvent.Pressed else InputEvent.Released)
+        }
+
+        glfwSetCursorPosCallback(window) { window, xpos, ypos ->
+            input.mouseMotion(width, height, xpos.toFloat(), ypos.toFloat())
         }
 
         glfwSetFramebufferSizeCallback(window) { window: Long, width: Int, height: Int ->
@@ -141,25 +145,23 @@ class DesktopApp(
 
         // Make the window visible
         glfwShowWindow(window)
-    }
 
-    override fun onResize(width: Int, height: Int) {
-        renderer.onResize(width, height)
-    }
-
-    override fun onReady() {
         // This line is critical for LWJGL's interoperation with GLFW's
         // OpenGL context, or any context that is managed externally.
         // LWJGL detects the context that is current in the current thread,
         // creates the GLCapabilities instance and makes the OpenGL
         // bindings available for use.
         GL.createCapabilities()
+    }
+
+    override fun onReady() {
+        val sceneGraph by inject<SceneGraph>()
+        sceneGraph.loadScene("test-models/suz.dae")
 
         //glEnable(GL_MULTISAMPLE)
+    }
 
-        renderer.onCreate()
-        renderer.onResize(width, height)
-
+    override fun live() {
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
         while (!glfwWindowShouldClose(window)) {
@@ -173,13 +175,7 @@ class DesktopApp(
         }
     }
 
-    override fun onUpdate(tpf: Float) {
-        renderer.onPreRender(tpf)
-        renderer.onRender()
-    }
-
     override fun onDestroy() {
-        renderer.onDestroy()
 
         // Free the window callbacks and destroy the window
         glfwFreeCallbacks(window)

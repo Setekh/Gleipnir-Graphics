@@ -1,15 +1,11 @@
-package eu.corvus.corax.graphics
+package eu.corvus.corax.graphics.material
 
 import eu.corvus.corax.scene.Object
 import eu.corvus.corax.utils.Logger
-import org.lwjgl.opengl.GL20.*
-import java.nio.FloatBuffer
-import org.lwjgl.system.MemoryStack
 import org.joml.Matrix4f
 import org.joml.Vector3f
-import org.lwjgl.opengl.GL20
-import java.util.HashMap
-
+import org.lwjgl.opengl.GL20.*
+import org.lwjgl.system.MemoryStack
 
 
 /**

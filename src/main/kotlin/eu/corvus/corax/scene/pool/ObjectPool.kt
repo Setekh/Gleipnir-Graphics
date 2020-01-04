@@ -1,7 +1,6 @@
 package eu.corvus.corax.scene.pool
 
 import eu.corvus.corax.scene.Object
-import eu.corvus.corax.utils.Disposable
 
 /**
  * @author Vlad Ravenholm on 11/24/2019

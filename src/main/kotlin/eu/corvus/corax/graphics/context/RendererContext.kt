@@ -30,7 +30,6 @@
 package eu.corvus.corax.graphics.context
 
 import eu.corvus.corax.graphics.Color
-import eu.corvus.corax.graphics.buffers.BufferObject
 import eu.corvus.corax.graphics.buffers.VertexArrayObject
 import eu.corvus.corax.graphics.buffers.VertexBufferObject
 import eu.corvus.corax.scene.Object

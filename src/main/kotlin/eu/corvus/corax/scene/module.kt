@@ -42,6 +42,6 @@ import org.koin.dsl.module
  */
 val sceneGraphModules = module {
     single<AssetManager> { AssetManagerImpl(get()) }
-    single<SceneGraph> { SceneGraphImpl() }
+    single<SceneGraph> { SceneGraphImpl(get(), get()) }
     single<ObjectPool> { ObjectPoolImpl() }
 }

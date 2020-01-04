@@ -51,7 +51,7 @@ val appModule = module {
 
     single<GleipnirApplication>(createdAtStart = true) {
         // Here will check the platform and see what type of app to start
-        DesktopApp(getProperty("engine.name"), get(), get(), get(), get())
+        DesktopApp(getProperty("engine.name"), get())
     }
 
 }

@@ -27,25 +27,23 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.app
+package eu.corvus.corax.graphics.material.textures
+
+import eu.corvus.corax.graphics.context.RendererContext
+import eu.corvus.corax.scene.Object
+import org.koin.core.get
 
 /**
- * @author Vlad Ravenholm on 11/30/2019
+ * @author Vlad Ravenholm on 12/28/2019
  */
-interface Input {
-    fun map(device: Device, target: Int, mapping: String, action: InputAction)
-    fun remove(mapping: String)
+abstract class Texture: Object() {
+    open var id: Int = 0
+        protected set
 
-    /**
-     * Usually available on desktop, so no need to map keys to any other device or map GLFW to anything else
-     */
-    fun keyPress(key: Int, event: InputEvent)
+    override fun free() {
+        super.free()
 
-    fun mousePress(button: Int, event: InputEvent)
-    fun mouseMotion(width: Int, height: Int, xpos: Float, ypos: Float)
+        val renderContext = get<RendererContext>()
+        renderContext.free(this)
+    }
 }
-
-enum class InputEvent { Pressed, Released, Repeat, Motion }
-
-enum class Device { Keyboard, Mouse, Controller }
-typealias InputAction = (mapping: String, status: InputEvent) -> Unit

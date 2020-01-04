@@ -69,6 +69,7 @@ class AssimpLoader : AssetManager.AssetLoader {
                 val geometry = Mesh(aiMesh.mName().dataString())
                 geometry.createMesh(vertexes, indices, texCoords, normals, tangents, bitangents)
                 geometry.forceUpdate()
+
                 spatial.appendChild(geometry)
             }
         }
