@@ -49,13 +49,13 @@ class GameGLRenderer(
     val shader: ShaderProgram by lazy {
         val shaderProgram = ShaderProgram()
         shaderProgram.createVertexShader(
-            Mesh::class.java.getResourceAsStream("/vertex.glsl").readBytes().toString(
+            Mesh::class.java.getResourceAsStream("#version 330\n\nuniform mat4 viewProjectionMatrix;\nuniform mat4 viewMatrix;\nuniform mat4 modelMatrix;\n\nuniform vec3 eye;\n\nlayout (location = 0) in vec3 position;\nlayout (location = 2) in vec3 normal;\n\nout vec3 norm;\nout vec3 peye;\nout vec3 pos;\n\nvoid main() {\n    vec4 modelProj = modelMatrix * vec4(position, 1.0);\n    pos = modelProj.xyz;\n\n    norm = normalize((modelMatrix * vec4(normal, 1.0)).xyz);\n    norm = mat3(viewMatrix) * norm;\n\n    peye = normalize(modelProj.xyz - eye);\n    peye = mat3(viewMatrix) * peye;\n\n    gl_Position = viewProjectionMatrix * modelProj;\n}").readBytes().toString(
                 Charsets.UTF_8
             )
         )
 
         shaderProgram.createFragmentShader(
-            Mesh::class.java.getResourceAsStream("/fragment.glsl").readBytes().toString(
+            Mesh::class.java.getResourceAsStream("#version 330\n\nout vec4 fragColor;\nin vec3 pos;\nin vec3 norm;\nin vec3 peye;\n\nuniform float inf;\n\nvec3 matcap(vec3 eye, vec3 normal) {\n    vec3 reflected = reflect(eye, normal);\n    float m = 2.8284271247461903 * sqrt( reflected.z+1.0 );\n    return reflected.xyz / m + 0.5; // before merge into master remove z, i made it vec3 for prezentation\n}\n\nvoid main() {\n    fragColor = vec4(matcap(peye, norm), 1.0);\n}").readBytes().toString(
                 Charsets.UTF_8
             )
         )

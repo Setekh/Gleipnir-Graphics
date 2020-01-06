@@ -32,6 +32,7 @@ package eu.corvus.corax.graphics.material.textures
 import eu.corvus.corax.graphics.context.RendererContext
 import eu.corvus.corax.scene.Object
 import org.koin.core.get
+import org.lwjgl.opengl.GL13.GL_TEXTURE0
 
 /**
  * @author Vlad Ravenholm on 12/28/2019
@@ -42,7 +43,7 @@ abstract class Texture: Object() {
 
     override fun free() {
         super.free()
-
+GL_TEXTURE0
         val renderContext = get<RendererContext>()
         renderContext.free(this)
     }

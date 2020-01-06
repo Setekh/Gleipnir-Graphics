@@ -29,9 +29,17 @@
  */
 package eu.corvus.corax.utils
 
+import org.joml.Matrix4f
+import org.joml.Matrix4fc
+import org.joml.Vector3f
+import org.joml.Vector3fc
+
 /**
  * @author Vlad Ravenholm on 1/3/2020
  */
+
+val MATRIX4f_IDENTITY: Matrix4fc = Matrix4f()
+val VECTOR3f_ZERO: Vector3fc = Vector3f()
 
 fun Float.toRadians(): Float = Math.toRadians(this.toDouble()).toFloat()
 

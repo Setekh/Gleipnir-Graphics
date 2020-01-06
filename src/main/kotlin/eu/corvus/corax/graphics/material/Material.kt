@@ -33,4 +33,5 @@ package eu.corvus.corax.graphics.material
  * @author Vlad Ravenholm on 1/4/2020
  */
 class Material {
+
 }
