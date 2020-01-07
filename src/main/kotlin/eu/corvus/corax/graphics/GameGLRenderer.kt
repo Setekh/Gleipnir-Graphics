@@ -30,11 +30,10 @@
 package eu.corvus.corax.graphics
 
 import eu.corvus.corax.graphics.context.RendererContext
-import eu.corvus.corax.graphics.material.ShaderProgram
 import eu.corvus.corax.scene.Camera
 import eu.corvus.corax.scene.geometry.Geometry
-import eu.corvus.corax.scene.geometry.Mesh
 import eu.corvus.corax.utils.ItemBuffer
+import eu.corvus.corax.utils.Logger
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL30.*
 
@@ -46,23 +45,7 @@ class GameGLRenderer(
 ) : Renderer {
     private val viewPortColor = Color.of(0.13f, 0.13f, 0.13f)
 
-    val shader: ShaderProgram by lazy {
-        val shaderProgram = ShaderProgram()
-        shaderProgram.createVertexShader(
-            Mesh::class.java.getResourceAsStream("/shaders/vertex.glsl").readBytes().toString(
-                Charsets.UTF_8
-            )
-        )
-
-        shaderProgram.createFragmentShader(
-            Mesh::class.java.getResourceAsStream("/shaders/fragment.glsl").readBytes().toString(
-                Charsets.UTF_8
-            )
-        )
-
-        shaderProgram.link()
-        shaderProgram
-    }
+    private var currentShaderId = -1
 
     override fun onCreate() {
         // Always on by default
@@ -74,34 +57,30 @@ class GameGLRenderer(
         //glEnable(GL_CULL_FACE)
         //glCullFace(GL_BACK)
 
-        shader.createUniform("viewProjectionMatrix")
-        shader.createUniform("viewMatrix")
-        shader.createUniform("modelMatrix")
-        shader.createUniform("eye")
-        shader.createUniform("inf")
     }
 
     override fun render(camera: Camera, renderBuffer: ItemBuffer<Geometry>) {
         rendererContext.viewPort(0, 0, camera.width, camera.height)
         rendererContext.clear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT or GL11.GL_STENCIL_BUFFER_BIT)
 
-        shader.bind() // This should be in a material?
-
         repeat(renderBuffer.limit) {
             val geometry = renderBuffer.get()
             val vertexArrayObject = geometry.vertexArrayObject!!
 
-            shader.setUniform("viewProjectionMatrix", camera.viewProjectionMatrix)
-            shader.setUniform("viewMatrix", camera.viewMatrix)
-            shader.setUniform("modelMatrix", geometry.worldMatrix)
-            shader.setUniform("eye", camera.worldTransform.translation)
-            shader.setUniform("inf", if (geometry.name != "Quad") 0.3f else 0.5f)
+            val material = geometry.material
+            val shader = material.shader
+            if (currentShaderId != shader.programId) { // switch shaders.. should be avoided
+                if (currentShaderId != -1)
+                    Logger.debug("Shader switched!")
+
+                currentShaderId = shader.programId
+            }
+
+            material.applyParams(camera, geometry)
 
             rendererContext.bindBufferArray(vertexArrayObject)
             rendererContext.draw(vertexArrayObject)
         }
-
-        shader.unbind()
     }
 
     override fun onDestroy() {

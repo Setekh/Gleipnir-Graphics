@@ -15,7 +15,8 @@ import eu.corvus.corax.scene.Spatial
  * @author Vlad Ravenholm on 11/24/2019
  */
 abstract class Geometry(name: String) : Spatial(name) {
-    private var material: Material = MatcapMaterial()
+    var material: Material = MatcapMaterial()
+
     abstract var vertexArrayObject: VertexArrayObject?
         protected set
 }

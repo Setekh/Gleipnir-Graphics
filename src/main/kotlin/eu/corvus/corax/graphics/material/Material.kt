@@ -29,28 +29,24 @@
  */
 package eu.corvus.corax.graphics.material
 
+import eu.corvus.corax.graphics.material.shaders.Shader
 import eu.corvus.corax.graphics.material.textures.Texture
+import eu.corvus.corax.scene.Camera
 import eu.corvus.corax.scene.Object
+import eu.corvus.corax.scene.geometry.Geometry
 import eu.corvus.corax.utils.Logger
 import org.joml.Matrix4f
 import org.joml.Vector3f
 
 /**
  * @author Vlad Ravenholm on 1/4/2020
+ *
+ * In the future materials and shader binding will done by generated code
  */
 abstract class Material: Object() {
     abstract val shader: Shader
 
-    val params: Map<String, Any> = hashMapOf() //hashmap of String MaterialParam actually
-
-    fun onReady() {
-        shader.onReady()
-
-        params.forEach { (name, value) ->
-            val uniform = getParam<Shader.Uniform<Any>>(name)
-            uniform?.update(value)
-        }
-    }
+    abstract fun applyParams(camera: Camera, geometry: Geometry)
 
     /**
      * For direct access
@@ -65,32 +61,25 @@ abstract class Material: Object() {
     }
 
     fun setParam(name: String, value: Matrix4f) {
-        getParam<Shader.Mat4fUniform>(name)?.update(value)
         updateParam(name, value)
     }
 
     fun setParam(name: String, value: Vector3f) {
-        getParam<Shader.Vec3fUniform>(name)?.update(value)
         updateParam(name, value)
     }
 
     fun setParam(name: String, value: Float) {
-        getParam<Shader.FloatUniform>(name)?.update(value)
         updateParam(name, value)
     }
 
     fun setParam(name: String, value: Int) {
-        getParam<Shader.IntUniform>(name)?.update(value)
         updateParam(name, value)
     }
 
     fun setParam(name: String, value: Texture) {
-        getParam<Shader.IntUniform>(name)?.update(value.id)
     }
 
     private fun updateParam(name: String, value: Any) {
-        params as HashMap
-        params[name] = value
     }
 
 }

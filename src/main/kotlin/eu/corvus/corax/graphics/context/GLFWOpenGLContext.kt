@@ -4,6 +4,7 @@ import eu.corvus.corax.graphics.*
 import eu.corvus.corax.graphics.buffers.VertexArrayObject
 import eu.corvus.corax.graphics.buffers.VertexBufferObject
 import eu.corvus.corax.graphics.buffers.types.*
+import eu.corvus.corax.graphics.material.shaders.Shader
 import eu.corvus.corax.graphics.material.textures.Texture
 import eu.corvus.corax.scene.Object
 import eu.corvus.corax.utils.Logger
@@ -36,6 +37,50 @@ class GLFWOpenGLContext : RendererContext {
     override fun bindBufferObject(vertexBufferObject: VertexBufferObject) {
         val target = targetBufferType(vertexBufferObject)
         glBindBuffer(target, vertexBufferObject.id)
+    }
+
+    override fun createProgram(shader: Shader) {
+        val programId = glCreateProgram()
+        shader.onCreate(programId)
+
+        val vertexShaderId = createShader(GL20.GL_VERTEX_SHADER, shader.vertexSource)
+        val fragmentShaderId = createShader(GL20.GL_FRAGMENT_SHADER, shader.fragmentSource)
+
+        glAttachShader(programId, vertexShaderId)
+        glAttachShader(programId, fragmentShaderId)
+
+        glLinkProgram(shader.programId)
+        if (glGetProgrami(shader.programId, GL_LINK_STATUS) == 0) {
+            throw Exception("Error linking Shader code: ${glGetProgramInfoLog(shader.programId, 1024)}")
+        }
+
+        glDetachShader(shader.programId, vertexShaderId)
+        glDetachShader(shader.programId, fragmentShaderId)
+
+        glValidateProgram(shader.programId)
+        if (glGetProgrami(shader.programId, GL_VALIDATE_STATUS) == 0) {
+            Logger.info("Warning validating Shader code: ${glGetProgramInfoLog(shader.programId, 1024)}")
+        }
+    }
+
+    override fun useProgram(shader: Shader) {
+        glUseProgram(shader.programId)
+    }
+
+    private fun createShader(shaderType: Int, shaderSource: String): Int {
+        val shaderId = glCreateShader(shaderType)
+        if (shaderId == 0) {
+            throw Exception("Error creating shader. Type: ${shaderTypeName(shaderType)}")
+        }
+
+        glShaderSource(shaderId, shaderSource)
+        glCompileShader(shaderId)
+
+        if (glGetShaderi(shaderId, GL_COMPILE_STATUS) == 0) {
+            throw Exception("Error compiling Shader code: ${glGetShaderInfoLog(shaderId, 1024)}")
+        }
+
+        return shaderId
     }
 
     override fun unbindBufferArray(vertexArrayObject: VertexArrayObject) {
@@ -109,12 +154,16 @@ class GLFWOpenGLContext : RendererContext {
     override fun setUniform1i(location: Int, value: Int) {
         glUniform1i(location, value)
     }
-    
+
     override fun getUniformLocation(programId: Int, name: String): Int {
         val uniformLocation = glGetUniformLocation(programId, name)
 
         if (uniformLocation < 0) {
-            Logger.warn("Could not find uniform:$name")
+            when (uniformLocation) {
+                -3 -> Logger.error("Trying to get an uniform from a uninitialized shader! $name")
+                -2 -> Logger.error("Trying to get an non existing uniform! $name")
+                -1 -> Logger.warn("Uniform exists but was optimized out of the shader code! $name")
+            }
         }
 
         return uniformLocation
@@ -136,6 +185,14 @@ class GLFWOpenGLContext : RendererContext {
             BufferType.Tangents -> GL15.GL_ARRAY_BUFFER
             BufferType.BiTangents -> GL15.GL_ARRAY_BUFFER
             BufferType.Indices -> GL15.GL_ELEMENT_ARRAY_BUFFER
+        }
+    }
+
+    private fun shaderTypeName(it: Int): String {
+        return when (it) {
+            GL_VERTEX_SHADER -> "Vertex shader"
+            GL_FRAGMENT_SHADER -> "Vertex shader"
+            else -> "Unknown type"
         }
     }
 }

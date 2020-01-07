@@ -30,11 +30,19 @@
 package eu.corvus.corax.graphics.material
 
 import eu.corvus.corax.graphics.material.shaders.MatcapShader
-import org.koin.core.inject
+import eu.corvus.corax.scene.geometry.Geometry
 
 /**
  * @author Vlad Ravenholm on 1/6/2020
  */
 class MatcapMaterial: Material() {
-    override val shader: Shader by inject<MatcapShader>()
+    override val shader = MatcapShader()
+
+    override fun applyParams(camera: eu.corvus.corax.scene.Camera, geometry: Geometry) {
+        shader.setUniformValue(shader.viewMatrix, camera.viewMatrix)
+        shader.setUniformValue(shader.viewProjection, camera.viewProjectionMatrix)
+        shader.setUniformValue(shader.modelMatrix, geometry.worldMatrix)
+
+        
+    }
 }
