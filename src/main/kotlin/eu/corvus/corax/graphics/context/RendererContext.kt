@@ -33,6 +33,8 @@ import eu.corvus.corax.graphics.Color
 import eu.corvus.corax.graphics.buffers.VertexArrayObject
 import eu.corvus.corax.graphics.buffers.VertexBufferObject
 import eu.corvus.corax.scene.Object
+import org.joml.Vector3fc
+import java.nio.FloatBuffer
 
 /**
  * @author Vlad Ravenholm on 12/21/2019
@@ -75,4 +77,10 @@ interface RendererContext {
     fun createArrayBufferData(vertexArrayObject: VertexArrayObject)
     fun free(glObject: Object)
     fun draw(vertexArrayObject: VertexArrayObject)
+
+    fun setUniformMatrix4fv(location: Int, transpose: Boolean, fb: FloatBuffer): Unit
+    fun setUniform3f(location: Int, value: Vector3fc)
+    fun setUniform1f(location: Int, value: Float)
+    fun getUniformLocation(programId: Int, name: String): Int
+    fun setUniform1i(location: Int, value: Int)
 }

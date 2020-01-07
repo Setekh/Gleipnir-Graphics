@@ -122,8 +122,8 @@ abstract class GleipnirApplication(
     fun startLifeCycle() {
         onCreate()
         try {
-            onReady()
             renderer.onCreate()
+            onReady()
             live()
         } catch (e: Exception) {
             Logger.error(e, "Fatal crash!")

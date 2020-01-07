@@ -6,13 +6,21 @@ import eu.corvus.corax.graphics.buffers.VertexBufferObject
 import eu.corvus.corax.graphics.buffers.types.*
 import eu.corvus.corax.graphics.material.textures.Texture
 import eu.corvus.corax.scene.Object
+import eu.corvus.corax.utils.Logger
+import org.joml.Vector3fc
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL15
+import org.lwjgl.opengl.GL20
 import org.lwjgl.opengl.GL30.*
 import java.nio.FloatBuffer
 import java.nio.IntBuffer
 
 class GLFWOpenGLContext : RendererContext {
+    init {
+        // Bind GL textures
+        GlTextureFormats.initialize()
+    }
+
     override fun viewPort(x: Int, y: Int, w: Int, h: Int) = glViewport(x, y, w, h)
 
     override fun clear(mask: Int) = glClear(mask)
@@ -84,6 +92,32 @@ class GLFWOpenGLContext : RendererContext {
         }
 
         glDrawElements(GL_TRIANGLES, vertexArrayObject.size, GL_UNSIGNED_INT, 0)
+    }
+
+    override fun setUniformMatrix4fv(location: Int, transpose: Boolean, fb: FloatBuffer) {
+        glUniformMatrix4fv(location, transpose, fb)
+    }
+
+    override fun setUniform1f(location: Int, value: Float) {
+        glUniform1f(location, value)
+    }
+
+    override fun setUniform3f(location: Int, value: Vector3fc) {
+        glUniform3f(location, value.x(), value.y(), value.z())
+    }
+
+    override fun setUniform1i(location: Int, value: Int) {
+        glUniform1i(location, value)
+    }
+    
+    override fun getUniformLocation(programId: Int, name: String): Int {
+        val uniformLocation = glGetUniformLocation(programId, name)
+
+        if (uniformLocation < 0) {
+            Logger.warn("Could not find uniform:$name")
+        }
+
+        return uniformLocation
     }
 
     override fun free(glObject: Object) {

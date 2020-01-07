@@ -29,25 +29,11 @@
  */
 package eu.corvus.corax.graphics.material.textures
 
-import eu.corvus.corax.graphics.context.RendererContext
-import eu.corvus.corax.scene.Object
-import org.koin.core.get
-import org.lwjgl.opengl.GL13.GL_TEXTURE0
-
 /**
- * @author Vlad Ravenholm on 12/28/2019
+ * @author Vlad Ravenholm on 1/6/2020
  */
-abstract class Texture: Object() {
-    open var id: Int = 0
-        protected set
+enum class Format {
+    RGBA8;
 
-    val isUploaded: Boolean
-        get() = id > 0
-
-    override fun free() {
-        super.free()
-
-        val renderContext = get<RendererContext>()
-        renderContext.free(this)
-    }
+    var rendererValue = 0
 }

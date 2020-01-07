@@ -29,9 +29,68 @@
  */
 package eu.corvus.corax.graphics.material
 
+import eu.corvus.corax.graphics.material.textures.Texture
+import eu.corvus.corax.scene.Object
+import eu.corvus.corax.utils.Logger
+import org.joml.Matrix4f
+import org.joml.Vector3f
+
 /**
  * @author Vlad Ravenholm on 1/4/2020
  */
-class Material {
+abstract class Material: Object() {
+    abstract val shader: Shader
+
+    val params: Map<String, Any> = hashMapOf() //hashmap of String MaterialParam actually
+
+    fun onReady() {
+        shader.onReady()
+
+        params.forEach { (name, value) ->
+            val uniform = getParam<Shader.Uniform<Any>>(name)
+            uniform?.update(value)
+        }
+    }
+
+    /**
+     * For direct access
+     *
+     * Warning: Will not affect serialized values, this may be used for real time processing
+     */
+    @Suppress("UNCHECKED_CAST")
+    fun <T: Shader.Uniform<out Any>> getParam(name: String): T? { // This is bad, info like this should be unique to the material, shaders are shared.
+        val uniform = shader.findUniform(name) as? T
+        uniform ?: let { Logger.warn("Missing param $name") }
+        return uniform
+    }
+
+    fun setParam(name: String, value: Matrix4f) {
+        getParam<Shader.Mat4fUniform>(name)?.update(value)
+        updateParam(name, value)
+    }
+
+    fun setParam(name: String, value: Vector3f) {
+        getParam<Shader.Vec3fUniform>(name)?.update(value)
+        updateParam(name, value)
+    }
+
+    fun setParam(name: String, value: Float) {
+        getParam<Shader.FloatUniform>(name)?.update(value)
+        updateParam(name, value)
+    }
+
+    fun setParam(name: String, value: Int) {
+        getParam<Shader.IntUniform>(name)?.update(value)
+        updateParam(name, value)
+    }
+
+    fun setParam(name: String, value: Texture) {
+        getParam<Shader.IntUniform>(name)?.update(value.id)
+    }
+
+    private fun updateParam(name: String, value: Any) {
+        params as HashMap
+        params[name] = value
+    }
 
 }

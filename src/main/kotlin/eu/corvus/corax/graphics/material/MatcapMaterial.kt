@@ -27,27 +27,14 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.graphics.material.textures
+package eu.corvus.corax.graphics.material
 
-import eu.corvus.corax.graphics.context.RendererContext
-import eu.corvus.corax.scene.Object
-import org.koin.core.get
-import org.lwjgl.opengl.GL13.GL_TEXTURE0
+import eu.corvus.corax.graphics.material.shaders.MatcapShader
+import org.koin.core.inject
 
 /**
- * @author Vlad Ravenholm on 12/28/2019
+ * @author Vlad Ravenholm on 1/6/2020
  */
-abstract class Texture: Object() {
-    open var id: Int = 0
-        protected set
-
-    val isUploaded: Boolean
-        get() = id > 0
-
-    override fun free() {
-        super.free()
-
-        val renderContext = get<RendererContext>()
-        renderContext.free(this)
-    }
+class MatcapMaterial: Material() {
+    override val shader: Shader by inject<MatcapShader>()
 }
