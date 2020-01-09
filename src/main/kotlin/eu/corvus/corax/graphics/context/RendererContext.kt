@@ -34,6 +34,7 @@ import eu.corvus.corax.graphics.buffers.VertexArrayObject
 import eu.corvus.corax.graphics.buffers.VertexBufferObject
 import eu.corvus.corax.graphics.material.shaders.Shader
 import eu.corvus.corax.scene.Object
+import eu.corvus.corax.scene.assets.AssetManager
 import org.joml.Vector3fc
 import java.nio.FloatBuffer
 
@@ -79,7 +80,7 @@ interface RendererContext {
     fun free(glObject: Object)
     fun draw(vertexArrayObject: VertexArrayObject)
 
-    fun createProgram(shader: Shader)
+    fun createProgram(assetManager: AssetManager, shader: Shader)
     fun useProgram(shader: Shader)
 
     fun setUniformMatrix4fv(location: Int, transpose: Boolean, fb: FloatBuffer): Unit

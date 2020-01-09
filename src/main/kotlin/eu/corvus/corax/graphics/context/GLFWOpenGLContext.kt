@@ -7,7 +7,9 @@ import eu.corvus.corax.graphics.buffers.types.*
 import eu.corvus.corax.graphics.material.shaders.Shader
 import eu.corvus.corax.graphics.material.textures.Texture
 import eu.corvus.corax.scene.Object
+import eu.corvus.corax.scene.assets.AssetManager
 import eu.corvus.corax.utils.Logger
+import kotlinx.coroutines.runBlocking
 import org.joml.Vector3fc
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL15
@@ -39,12 +41,12 @@ class GLFWOpenGLContext : RendererContext {
         glBindBuffer(target, vertexBufferObject.id)
     }
 
-    override fun createProgram(shader: Shader) {
+    override fun createProgram(assetManager: AssetManager, shader: Shader) {
         val programId = glCreateProgram()
         shader.onCreate(programId)
 
-        val vertexShaderId = createShader(GL20.GL_VERTEX_SHADER, shader.vertexSource)
-        val fragmentShaderId = createShader(GL20.GL_FRAGMENT_SHADER, shader.fragmentSource)
+        val vertexShaderId = createShader(assetManager, GL20.GL_VERTEX_SHADER, shader.vertexResource)
+        val fragmentShaderId = createShader(assetManager, GL20.GL_FRAGMENT_SHADER, shader.fragmentResource)
 
         glAttachShader(programId, vertexShaderId)
         glAttachShader(programId, fragmentShaderId)
@@ -61,13 +63,17 @@ class GLFWOpenGLContext : RendererContext {
         if (glGetProgrami(shader.programId, GL_VALIDATE_STATUS) == 0) {
             Logger.info("Warning validating Shader code: ${glGetProgramInfoLog(shader.programId, 1024)}")
         }
+
+        shader.onReady()
     }
 
     override fun useProgram(shader: Shader) {
         glUseProgram(shader.programId)
     }
 
-    private fun createShader(shaderType: Int, shaderSource: String): Int {
+    private fun createShader(assetManager: AssetManager, shaderType: Int, shaderResource: String): Int {
+        val shaderSource = runBlocking { assetManager.loadRaw(shaderResource).toString(Charsets.UTF_8) }
+
         val shaderId = glCreateShader(shaderType)
         if (shaderId == 0) {
             throw Exception("Error creating shader. Type: ${shaderTypeName(shaderType)}")

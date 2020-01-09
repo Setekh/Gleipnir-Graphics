@@ -7,6 +7,7 @@ import eu.corvus.corax.scene.Spatial
 import eu.corvus.corax.scene.assets.loaders.AssimpLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlin.properties.Delegates
 
 class AssetManagerImpl(
     private val storageAccess: StorageAccess
@@ -34,6 +35,15 @@ class AssetManagerImpl(
 
     override suspend fun loadTexture(assetName: String): Texture {
         TODO()
+    }
+
+    override suspend fun loadRaw(assetPath: String): ByteArray = withContext(Dispatchers.IO) { // this is not cache-able
+        var data: ByteArray by Delegates.notNull()
+        storageAccess.readFrom(assetPath) {
+             data = it.readBytes()
+        }
+
+        data
     }
 
     override fun unload(assetName: String) {

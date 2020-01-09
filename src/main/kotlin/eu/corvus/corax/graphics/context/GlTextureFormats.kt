@@ -31,6 +31,9 @@ package eu.corvus.corax.graphics.context
 
 import eu.corvus.corax.graphics.material.textures.Format
 import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL11.GL_RGBA8
+import org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE
+import org.lwjgl.opengl.GL12.*
 
 /**
  * @author Vlad Ravenholm on 1/6/2020
@@ -38,7 +41,14 @@ import org.lwjgl.opengl.GL11
 internal sealed class GlTextureFormats {
     companion object {
         internal fun initialize() {
-            Format.RGBA8.rendererValue = GL11.GL_RGBA8
+            Format.values().forEach {
+                when(it) {
+                    Format.RGBA8 -> formatToGL[it.ordinal] = GLImageFormat(GL_RGBA8, GL11.GL_RGB, GL_UNSIGNED_BYTE, false)
+                    Format.ABGR8 -> formatToGL[it.ordinal] = GLImageFormat(GL_RGBA8,  GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, false)
+                    Format.BGR8 -> formatToGL[it.ordinal] = GLImageFormat(GL_RGBA8, GL_BGR, GL_UNSIGNED_BYTE, false)
+                    else -> error("Unknown type! $it")
+                }
+            }
         }
     }
 }

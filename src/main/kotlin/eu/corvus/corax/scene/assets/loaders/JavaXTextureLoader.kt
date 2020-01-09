@@ -30,17 +30,46 @@
 package eu.corvus.corax.scene.assets.loaders
 
 import eu.corvus.corax.app.storage.StorageAccess
+import eu.corvus.corax.graphics.material.textures.Format
 import eu.corvus.corax.scene.Object
 import eu.corvus.corax.scene.assets.AssetManager
+import org.lwjgl.system.MemoryUtil
+import java.awt.image.BufferedImage
+import java.awt.image.DataBuffer
+import java.awt.image.DataBufferByte
+import java.awt.image.DataBufferUShort
 import javax.imageio.ImageIO
+
 
 /**
  * @author Vlad Ravenholm on 1/6/2020
  */
 class JavaXTextureLoader: AssetManager.AssetLoader {
     override suspend fun load(assetManager: AssetManager, storageAccess: StorageAccess, path: String): Object {
-        storageAccess.readFrom(path) {
-            val bufferedImage = ImageIO.read(it)
+        storageAccess.readFrom(path) { stream ->
+            val bufferedImage = ImageIO.read(stream)
+
+            val format = when (bufferedImage.type) {
+                BufferedImage.TYPE_4BYTE_ABGR -> Format.ABGR8
+                BufferedImage.TYPE_3BYTE_BGR -> Format.BGR8
+                else -> error("No such type ${bufferedImage.type}")
+            }
+
+            val pixelSize = bufferedImage.colorModel.pixelSize
+            val buffer = MemoryUtil.memAlloc(pixelSize * bufferedImage.width * bufferedImage.height)
+
+            val buf = bufferedImage.raster.dataBuffer
+            when (buf.dataType) {
+                DataBuffer.TYPE_BYTE -> {
+                    val byteBuf = buf as DataBufferByte
+                    buffer.put(byteBuf.data)
+                }
+                DataBuffer.TYPE_USHORT -> {
+                    val shortBuf = buf as DataBufferUShort
+                    val bytes = shortBuf.data.map { it.toByte() }.toByteArray()
+                    buffer.put(bytes)
+                }
+            }
 
         }
 

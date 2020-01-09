@@ -33,7 +33,7 @@ package eu.corvus.corax.graphics.material.textures
  * @author Vlad Ravenholm on 1/6/2020
  */
 enum class Format {
-    RGBA8;
-
-    var rendererValue = 0
+    RGBA8,
+    ABGR8,
+    BGR8;
 }

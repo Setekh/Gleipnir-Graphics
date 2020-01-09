@@ -30,6 +30,7 @@
 package eu.corvus.corax.graphics
 
 import eu.corvus.corax.graphics.context.RendererContext
+import eu.corvus.corax.graphics.material.Material
 import eu.corvus.corax.scene.Camera
 import eu.corvus.corax.scene.geometry.Geometry
 import eu.corvus.corax.utils.ItemBuffer
@@ -43,6 +44,7 @@ import org.lwjgl.opengl.GL30.*
 class GameGLRenderer(
     private val rendererContext: RendererContext
 ) : Renderer {
+    private val forceMaterial: Material? = null
     private val viewPortColor = Color.of(0.13f, 0.13f, 0.13f)
 
     private var currentShaderId = -1
@@ -67,13 +69,14 @@ class GameGLRenderer(
             val geometry = renderBuffer.get()
             val vertexArrayObject = geometry.vertexArrayObject!!
 
-            val material = geometry.material
+            val material = forceMaterial ?: geometry.material
             val shader = material.shader
-            if (currentShaderId != shader.programId) { // switch shaders.. should be avoided
+            if (currentShaderId != shader.programId) {
                 if (currentShaderId != -1)
                     Logger.debug("Shader switched!")
 
                 currentShaderId = shader.programId
+                rendererContext.useProgram(shader)
             }
 
             material.applyParams(camera, geometry)
@@ -86,5 +89,4 @@ class GameGLRenderer(
     override fun onDestroy() {
 
     }
-
 }

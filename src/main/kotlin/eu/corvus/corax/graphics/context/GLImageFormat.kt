@@ -27,28 +27,18 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.scene.assets
+package eu.corvus.corax.graphics.context
 
-import eu.corvus.corax.app.storage.StorageAccess
-import eu.corvus.corax.graphics.material.textures.Texture
-import eu.corvus.corax.scene.Object
-import eu.corvus.corax.scene.Spatial
+import eu.corvus.corax.graphics.material.textures.Format
 
 /**
- * @author Vlad Ravenholm on 12/28/2019
+ * @author Vlad Ravenholm on 1/7/2020
  */
-interface AssetManager {
-    fun addLoader(suffix: String, assetLoader: AssetLoader)
+data class GLImageFormat(
+    val internalFormat: Int = 0,
+    val format: Int = 0,
+    val dataType: Int = 0,
+    val compressed: Boolean = false
+)
 
-    fun removeLoader(suffix: String)
-
-    suspend fun loadSpatial(assetName: String): Spatial
-    suspend fun loadTexture(assetName: String): Texture
-    suspend fun loadRaw(assetPath: String): ByteArray
-
-    fun unload(assetName: String)
-
-    interface AssetLoader {
-        suspend fun load(assetManager: AssetManager, storageAccess: StorageAccess, path: String): Object
-    }
-}
+val formatToGL = arrayOfNulls<GLImageFormat>(Format.values().size)

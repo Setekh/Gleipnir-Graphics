@@ -13,15 +13,16 @@ abstract class Shader: Object() {
     var programId: Int = 0
         protected set
 
-    abstract val vertexSource: String
-    abstract val fragmentSource: String
+    val isUploaded: Boolean
+        get() = programId > 0
+
+    abstract val vertexResource: String
+    abstract val fragmentResource: String
 
     protected abstract val uniforms: Array<out Uniform<out Any>>
 
     fun onCreate(programId: Int) {
         this.programId = programId
-
-        onReady()
     }
 
     abstract class Uniform<T : Any>(val name: String) {
@@ -33,7 +34,7 @@ abstract class Shader: Object() {
         var uniformLocation: Int = -3
             internal set
 
-        val isUploaded: Boolean
+        val isValid: Boolean
             get() = uniformLocation >= -2
 
         override fun toString(): String = "Uniform[$name]"
@@ -64,7 +65,6 @@ abstract class Shader: Object() {
         }
     }
 
-
     open fun onReady() {
         createUniform(*uniforms)
     }
@@ -86,4 +86,3 @@ abstract class Shader: Object() {
         return uniforms.first { name == it.name }
     }
 }
-

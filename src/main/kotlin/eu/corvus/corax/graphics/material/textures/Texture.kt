@@ -33,6 +33,7 @@ import eu.corvus.corax.graphics.context.RendererContext
 import eu.corvus.corax.scene.Object
 import org.koin.core.get
 import org.lwjgl.opengl.GL13.GL_TEXTURE0
+import java.nio.IntBuffer
 
 /**
  * @author Vlad Ravenholm on 12/28/2019
