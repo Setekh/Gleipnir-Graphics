@@ -15,6 +15,6 @@ vec2 matcap(vec3 eye, vec3 normal) {
 
 void main() {
     vec2 uv = matcap(peye, norm);
-    vec3 color = texture2D(texture, uv).rgb;
+    vec3 color = texture(texture, uv).rgb;
     fragColor = vec4(color, 1.0);
 }

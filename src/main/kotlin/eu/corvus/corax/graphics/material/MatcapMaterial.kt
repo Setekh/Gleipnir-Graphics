@@ -31,12 +31,16 @@ package eu.corvus.corax.graphics.material
 
 import eu.corvus.corax.graphics.material.shaders.MatcapShader
 import eu.corvus.corax.scene.Camera
+import eu.corvus.corax.scene.assets.AssetManager
 import eu.corvus.corax.scene.geometry.Geometry
+import kotlinx.coroutines.runBlocking
+import org.koin.core.KoinComponent
+import org.koin.core.get
 
 /**
  * @author Vlad Ravenholm on 1/6/2020
  */
-class MatcapMaterial: Material() {
+class MatcapMaterial: Material(), KoinComponent {
     override val shader = MatcapShader()
 
     override fun applyParams(camera: Camera, geometry: Geometry) {
@@ -45,5 +49,8 @@ class MatcapMaterial: Material() {
         shader.setUniformValue(shader.modelMatrix, geometry.worldMatrix)
 
         //shader.setUniformValue(shader.texture, texture)
+
+        val loadTexture = runBlocking { get<AssetManager>().loadTexture("textures/matcap.png") }
+        shader.setUniformValue(shader.texture, loadTexture)
     }
 }
