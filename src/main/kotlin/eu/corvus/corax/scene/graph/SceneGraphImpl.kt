@@ -74,7 +74,7 @@ class SceneGraphImpl(
                 val width = app.width
                 val height = app.height
 
-                useAsProjection(70f.toRadians(), width / height.toFloat())
+                useAsPerspective(70f.toRadians(), width / height.toFloat())
                 updateResize(width, height)
 
                 transform.translation.set(0f, 0f, -5f)
@@ -150,5 +150,11 @@ class SceneGraphImpl(
             val node = scene.child(it)
             queueScene(node, tpf)
         }
+    }
+
+    override fun free() {
+        super.free()
+
+        job.cancel()
     }
 }

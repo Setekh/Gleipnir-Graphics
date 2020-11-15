@@ -10,26 +10,27 @@ package eu.corvus.corax.scene
  */
 open class Node(var name: String = "Node"): Object() {
     val children: List<Node> = arrayListOf()
-    private val mChildren = children as MutableList
 
     var parent: Node? = null
 
     open fun appendChild(child: Node) {
-        mChildren.add(child)
+        children as MutableList
+        children.add(child)
         child.parent = this
     }
 
     open fun removeChild(child: Node) {
-        mChildren.remove(child)
+        children as MutableList
+        children.remove(child)
         child.parent = null
     }
 
     open fun child(index: Int): Node {
-        val list = mChildren as ArrayList
-        return list[index]
+        return children[index]
     }
 
     fun removeChildren() {
-        mChildren.clear()
+        children as MutableList
+        children.clear()
     }
 }

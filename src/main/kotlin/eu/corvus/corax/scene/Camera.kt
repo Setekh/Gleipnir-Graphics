@@ -34,7 +34,7 @@ open class Camera(name: String = "Camera") : Spatial(name) {
     val left: Vector3f
         get() = transform.rotation.positiveX(Vector3f())
 
-    fun useAsProjection(fov: Float, aspectRatio: Float, near: Float = 0.01f, far: Float = 300f) {
+    fun useAsPerspective(fov: Float, aspectRatio: Float, near: Float = 0.01f, far: Float = 300f) {
         this.fov = fov
         projectionMatrix.identity().perspective(fov, aspectRatio, near, far)
         isPerspective = true
@@ -43,7 +43,7 @@ open class Camera(name: String = "Camera") : Spatial(name) {
     fun updateResize(width: Int, height: Int) {
         val aspectRatio = width.toFloat() / height.toFloat()
         if (isPerspective)
-            useAsProjection(fov, aspectRatio)
+            useAsPerspective(fov, aspectRatio)
         else
             error("Not supported!")
 
@@ -58,8 +58,8 @@ open class Camera(name: String = "Camera") : Spatial(name) {
     }
 
     private fun computeMatrices() {
-        val cameraPos = transform.translation
-        val rotation = transform.rotation
+        val cameraPos = worldTransform.translation
+        val rotation = worldTransform.rotation
 
         viewMatrix.identity().rotate(rotation).translate(cameraPos)
         viewProjectionMatrix.set(projectionMatrix).mul(viewMatrix)
