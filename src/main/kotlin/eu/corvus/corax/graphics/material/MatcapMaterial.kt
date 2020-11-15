@@ -27,28 +27,55 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.scene.assets
+package eu.corvus.corax.graphics.material
 
-import eu.corvus.corax.app.storage.StorageAccess
+import eu.corvus.corax.graphics.context.RendererContext
+import eu.corvus.corax.graphics.material.shaders.MatcapShader
 import eu.corvus.corax.graphics.material.textures.Texture
-import eu.corvus.corax.scene.Object
-import eu.corvus.corax.scene.Spatial
+import eu.corvus.corax.scene.Camera
+import eu.corvus.corax.scene.assets.AssetManager
+import eu.corvus.corax.scene.geometry.Geometry
+import kotlinx.coroutines.runBlocking
+import org.koin.core.KoinComponent
 
 /**
- * @author Vlad Ravenholm on 12/28/2019
+ * @author Vlad Ravenholm on 1/6/2020
  */
-interface AssetManager {
-    fun addLoader(suffix: String, assetLoader: AssetLoader)
+class MatcapMaterial: Material(), KoinComponent {
+    override val shader = MatcapShader()
+    var textureParam: String? = "textures/matcap.png"
+    var texture: Texture? = null
 
-    fun removeLoader(suffix: String)
+    override fun applyParams(
+        renderContext: RendererContext,
+        camera: Camera,
+        geometry: Geometry
+    ) {
+        shader.setUniformValue(shader.viewMatrix, camera.viewMatrix)
+        shader.setUniformValue(shader.viewProjection, camera.viewProjectionMatrix)
+        shader.setUniformValue(shader.modelMatrix, geometry.worldMatrix)
 
-    suspend fun loadSpatial(assetName: String): Spatial
-    suspend fun loadTexture(assetName: String): Texture
-    suspend fun loadRaw(assetPath: String): ByteArray
+        val texture = texture ?: return
+        shader.setUniformValue(shader.texture, 0)
 
-    fun unload(assetName: String)
+        renderContext.useTexture(texture)
+    }
 
-    interface AssetLoader {
-        suspend fun load(assetManager: AssetManager, storageAccess: StorageAccess, path: String): Object
+    override fun prepareUpload(assetManager: AssetManager, rendererContext: RendererContext) {
+        super.prepareUpload(assetManager, rendererContext)
+
+        if (texture != null && !texture!!.isUploaded) {
+            rendererContext.createTexture(texture!!)
+            return
+        }
+
+        if (texture == null) {
+            val textureParam = textureParam ?: return
+            val texture = runBlocking { assetManager.loadTexture(textureParam) }
+
+            this.texture = texture
+
+            rendererContext.createTexture(texture)
+        }
     }
 }

@@ -29,13 +29,30 @@
  */
 package eu.corvus.corax.scene.graph
 
+import eu.corvus.corax.scene.Camera
 import eu.corvus.corax.scene.Node
+import eu.corvus.corax.scene.geometry.Geometry
+import eu.corvus.corax.utils.ItemBuffer
 
 /**
  * @author Vlad Ravenholm on 12/2/2019
  */
 interface SceneGraph {
-    val rootNode: Node
+    val sceneTree: Node
 
+    val cameras: List<Camera>
 
+    val renderBuffer: ItemBuffer<Geometry>
+
+    val isRenderReady: Boolean
+
+    fun loadScene(path: String)
+    fun saveScene(path: String)
+
+    suspend fun processTree()
+
+    // Todo make a way to register cameras
+    fun prepareGraph(camera: Camera, tpf: Float)
+
+    fun resizeViewPort(width: Int, height: Int)
 }

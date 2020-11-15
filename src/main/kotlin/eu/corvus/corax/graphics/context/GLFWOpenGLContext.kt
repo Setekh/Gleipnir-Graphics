@@ -3,16 +3,34 @@ package eu.corvus.corax.graphics.context
 import eu.corvus.corax.graphics.*
 import eu.corvus.corax.graphics.buffers.VertexArrayObject
 import eu.corvus.corax.graphics.buffers.VertexBufferObject
-import eu.corvus.corax.graphics.buffers.types.*
-import eu.corvus.corax.graphics.textures.Texture
+import eu.corvus.corax.graphics.buffers.types.BufferType
+import eu.corvus.corax.graphics.buffers.types.IndexBuffer
+import eu.corvus.corax.graphics.buffers.types.data
+import eu.corvus.corax.graphics.material.shaders.Shader
+import eu.corvus.corax.graphics.material.textures.Texture
 import eu.corvus.corax.scene.Object
+import eu.corvus.corax.scene.assets.AssetManager
+import eu.corvus.corax.utils.Logger
+import eu.corvus.corax.utils.component1
+import eu.corvus.corax.utils.component2
+import kotlinx.coroutines.runBlocking
+import org.joml.Vector3fc
 import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL13
 import org.lwjgl.opengl.GL15
+import org.lwjgl.opengl.GL20
 import org.lwjgl.opengl.GL30.*
+import org.lwjgl.stb.STBImage.stbi_image_free
+import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 import java.nio.IntBuffer
 
 class GLFWOpenGLContext : RendererContext {
+    init {
+        // Bind GL textures
+        GlTextureFormats.initialize()
+    }
+
     override fun viewPort(x: Int, y: Int, w: Int, h: Int) = glViewport(x, y, w, h)
 
     override fun clear(mask: Int) = glClear(mask)
@@ -28,6 +46,54 @@ class GLFWOpenGLContext : RendererContext {
     override fun bindBufferObject(vertexBufferObject: VertexBufferObject) {
         val target = targetBufferType(vertexBufferObject)
         glBindBuffer(target, vertexBufferObject.id)
+    }
+
+    override fun createProgram(assetManager: AssetManager, shader: Shader) {
+        val programId = glCreateProgram()
+        shader.onCreate(programId)
+
+        val vertexShaderId = createShader(assetManager, GL20.GL_VERTEX_SHADER, shader.vertexResource)
+        val fragmentShaderId = createShader(assetManager, GL20.GL_FRAGMENT_SHADER, shader.fragmentResource)
+
+        glAttachShader(programId, vertexShaderId)
+        glAttachShader(programId, fragmentShaderId)
+
+        glLinkProgram(shader.programId)
+        if (glGetProgrami(shader.programId, GL_LINK_STATUS) == 0) {
+            throw Exception("Error linking Shader code: ${glGetProgramInfoLog(shader.programId, 1024)}")
+        }
+
+        glDetachShader(shader.programId, vertexShaderId)
+        glDetachShader(shader.programId, fragmentShaderId)
+
+        glValidateProgram(shader.programId)
+        if (glGetProgrami(shader.programId, GL_VALIDATE_STATUS) == 0) {
+            Logger.info("Warning validating Shader code: ${glGetProgramInfoLog(shader.programId, 1024)}")
+        }
+
+        shader.onReady()
+    }
+
+    override fun useProgram(shader: Shader) {
+        glUseProgram(shader.programId)
+    }
+
+    private fun createShader(assetManager: AssetManager, shaderType: Int, shaderResource: String): Int {
+        val shaderSource = runBlocking { assetManager.loadRaw(shaderResource).toString(Charsets.UTF_8) }
+
+        val shaderId = glCreateShader(shaderType)
+        if (shaderId == 0) {
+            throw Exception("Error creating shader. Type: ${shaderTypeName(shaderType)}")
+        }
+
+        glShaderSource(shaderId, shaderSource)
+        glCompileShader(shaderId)
+
+        if (glGetShaderi(shaderId, GL_COMPILE_STATUS) == 0) {
+            throw Exception("Error compiling Shader code: ${glGetShaderInfoLog(shaderId, 1024)}")
+        }
+
+        return shaderId
     }
 
     override fun unbindBufferArray(vertexArrayObject: VertexArrayObject) {
@@ -51,14 +117,43 @@ class GLFWOpenGLContext : RendererContext {
 
             bufferObject.onAssign(id)
             when (bufferObject) {
-                is VertexBuffer, is TextureCoordsBuffer, is NormalBuffer, is TangentBuffer, is BiTangentBuffer -> createFloatBufferData(
+                is IndexBuffer -> createIndexBufferData(bufferObject)
+                else -> createFloatBufferData(
                     bufferObject.type.ordinal,
                     bufferObject
                 )
-                is IndexBuffer -> createIndexBufferData(bufferObject)
             }
             bufferObject.clearData()
         }
+    }
+
+    override fun createTexture(texture: Texture) {
+        val id = GL11.glGenTextures()
+        glBindTexture(GL_TEXTURE_2D, id)
+        texture.onAssign(id)
+
+        // TODO Move this in texture
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
+
+        val (width, height) = texture.dimensions
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
+            0, GL_RGBA, GL_UNSIGNED_BYTE, texture.buffer as ByteBuffer)
+
+        if (texture.generateMipMaps) {
+            glGenerateMipmap(GL_TEXTURE_2D)
+        }
+
+        texture.freeData()
+    }
+
+    override fun useTexture(texture: Texture) {
+        glBindTexture(GL11.GL_TEXTURE_2D, texture.id)
+        glActiveTexture(GL13.GL_TEXTURE0)
     }
 
     private fun createIndexBufferData(bufferObject: IndexBuffer) {
@@ -86,6 +181,36 @@ class GLFWOpenGLContext : RendererContext {
         glDrawElements(GL_TRIANGLES, vertexArrayObject.size, GL_UNSIGNED_INT, 0)
     }
 
+    override fun setUniformMatrix4fv(location: Int, transpose: Boolean, fb: FloatBuffer) {
+        glUniformMatrix4fv(location, transpose, fb)
+    }
+
+    override fun setUniform1f(location: Int, value: Float) {
+        glUniform1f(location, value)
+    }
+
+    override fun setUniform3f(location: Int, value: Vector3fc) {
+        glUniform3f(location, value.x(), value.y(), value.z())
+    }
+
+    override fun setUniform1i(location: Int, value: Int) {
+        glUniform1i(location, value)
+    }
+
+    override fun getUniformLocation(programId: Int, name: String): Int {
+        val uniformLocation = glGetUniformLocation(programId, name)
+
+        if (uniformLocation < 0) {
+            when (uniformLocation) {
+                -3 -> Logger.error("Trying to get an uniform from a uninitialized shader! $name")
+                -2 -> Logger.error("Trying to get an non existing uniform! $name")
+                -1 -> Logger.warn("Uniform exists but was optimized out of the shader code! $name")
+            }
+        }
+
+        return uniformLocation
+    }
+
     override fun free(glObject: Object) {
         when (glObject) {
             is VertexArrayObject -> glDeleteVertexArrays(glObject.id)
@@ -102,6 +227,14 @@ class GLFWOpenGLContext : RendererContext {
             BufferType.Tangents -> GL15.GL_ARRAY_BUFFER
             BufferType.BiTangents -> GL15.GL_ARRAY_BUFFER
             BufferType.Indices -> GL15.GL_ELEMENT_ARRAY_BUFFER
+        }
+    }
+
+    private fun shaderTypeName(it: Int): String {
+        return when (it) {
+            GL_VERTEX_SHADER -> "Vertex shader"
+            GL_FRAGMENT_SHADER -> "Vertex shader"
+            else -> "Unknown type"
         }
     }
 }

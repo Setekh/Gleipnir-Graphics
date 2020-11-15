@@ -32,8 +32,10 @@ package eu.corvus.corax.app.input
 import eu.corvus.corax.app.Device
 import eu.corvus.corax.app.Input
 import eu.corvus.corax.app.InputAction
-import eu.corvus.corax.app.KeyEvent
+import eu.corvus.corax.app.InputEvent
 import eu.corvus.corax.utils.Logger
+import org.joml.Vector2f
+
 
 /**
  * @author Vlad Ravenholm on 11/30/2019
@@ -41,22 +43,41 @@ import eu.corvus.corax.utils.Logger
 class AppInput: Input {
     private val actions: MutableMap<String, InputAction> = mutableMapOf()
     private val keyMap: MutableMap<Int, String> = mutableMapOf()
+    private val mouseMap: MutableMap<Int, String> = mutableMapOf()
 
-    override fun keyPress(key: Int, event: KeyEvent) {
-        if (event == KeyEvent.Repeat) return // not finding an use right now
+    val lastMousePosition = Vector2f()
+    val mousePositionDelta = Vector2f()
+
+    override fun keyPress(key: Int, event: InputEvent) {
+        if (event == InputEvent.Repeat) return // not finding an use right now
         val mapping = keyMap[key] ?: return
         actions[mapping]?.invoke(mapping, event) ?: let { Logger.error("How did we get here? null mapping! $mapping") }
     }
 
+    override fun mousePress(button: Int, event: InputEvent) {
+        if (event == InputEvent.Repeat) return // not finding an use right now
+        val mapping = mouseMap[button] ?: return
+        actions[mapping]?.invoke(mapping, event) ?: let { Logger.error("How did we get here? null mapping! $mapping") }
+    }
+
+    override fun mouseMotion(width: Int, height: Int, xpos: Float, ypos: Float) {
+        val newPos = Vector2f(xpos, ypos)
+
+        mousePositionDelta.set(lastMousePosition.sub(newPos)).normalize()
+
+        lastMousePosition.set(xpos, ypos)
+
+        //println("xpos = [${mousePositionDelta.x}], ypos = [${mousePositionDelta.y}]")
+    }
+
     override fun map(device: Device, target: Int, mapping: String, action: InputAction) {
         when (device) {
-            Device.Keyboard -> {
-                keyMap[target] = mapping
-                actions[mapping] = action
-            }
-            Device.Mouse -> TODO()
+            Device.Keyboard -> keyMap[target] = mapping
+            Device.Mouse -> mouseMap[target] = mapping
             Device.Controller -> TODO()
         }
+
+        actions[mapping] = action
     }
 
     override fun remove(mapping: String) {

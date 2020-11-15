@@ -27,28 +27,13 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.scene.assets
-
-import eu.corvus.corax.app.storage.StorageAccess
-import eu.corvus.corax.graphics.material.textures.Texture
-import eu.corvus.corax.scene.Object
-import eu.corvus.corax.scene.Spatial
+package eu.corvus.corax.graphics.material.textures
 
 /**
- * @author Vlad Ravenholm on 12/28/2019
+ * @author Vlad Ravenholm on 1/6/2020
  */
-interface AssetManager {
-    fun addLoader(suffix: String, assetLoader: AssetLoader)
-
-    fun removeLoader(suffix: String)
-
-    suspend fun loadSpatial(assetName: String): Spatial
-    suspend fun loadTexture(assetName: String): Texture
-    suspend fun loadRaw(assetPath: String): ByteArray
-
-    fun unload(assetName: String)
-
-    interface AssetLoader {
-        suspend fun load(assetManager: AssetManager, storageAccess: StorageAccess, path: String): Object
-    }
+enum class Format {
+    RGBA8,
+    ABGR8,
+    BGR8;
 }

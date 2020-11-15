@@ -18,7 +18,7 @@ open class Spatial(name: String = "Spatial") : Node(name) {
     val worldTransform: Transform =
         Transform()
 
-    val alwaysCompute = false
+    var alwaysCompute = false
 
     val worldMatrix = Matrix4f()
 
@@ -29,7 +29,7 @@ open class Spatial(name: String = "Spatial") : Node(name) {
         shouldCompute = true
     }
 
-    private fun computeWorldTransform() {
+    protected open fun computeWorldTransform() {
         val parent = this.parent
         worldTransform.set(transform)
 

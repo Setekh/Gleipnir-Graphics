@@ -27,28 +27,42 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.scene.assets
+package eu.corvus.corax.platforms.desktop.assets.loaders
 
 import eu.corvus.corax.app.storage.StorageAccess
-import eu.corvus.corax.graphics.material.textures.Texture
+import eu.corvus.corax.graphics.material.textures.Texture2D_PC
 import eu.corvus.corax.scene.Object
-import eu.corvus.corax.scene.Spatial
+import eu.corvus.corax.scene.assets.AssetManager
+import org.joml.Vector2i
+import org.lwjgl.stb.STBImage.stbi_failure_reason
+import org.lwjgl.stb.STBImage.stbi_load_from_memory
+import org.lwjgl.system.MemoryStack
+import java.nio.Buffer
+
 
 /**
- * @author Vlad Ravenholm on 12/28/2019
+ * @author Vlad Ravenholm on 1/6/2020
  */
-interface AssetManager {
-    fun addLoader(suffix: String, assetLoader: AssetLoader)
+class TextureLoader : AssetManager.AssetLoader {
+    override suspend fun load(assetManager: AssetManager, storageAccess: StorageAccess, path: String): Object {
+        val texture = Texture2D_PC()
 
-    fun removeLoader(suffix: String)
+        storageAccess.readFrom(path) { stream ->
+            MemoryStack.stackPush().use { stack ->
+                val readBytes = stream.readBytes()
+                val buffer = stack.malloc(readBytes.size)
+                buffer.put(readBytes).flip()
 
-    suspend fun loadSpatial(assetName: String): Spatial
-    suspend fun loadTexture(assetName: String): Texture
-    suspend fun loadRaw(assetPath: String): ByteArray
+                val w = stack.mallocInt(1)
+                val h = stack.mallocInt(1)
+                val channels = stack.mallocInt(1)
 
-    fun unload(assetName: String)
+                val texBuffer = stbi_load_from_memory(buffer, w, h, channels, 4)
+                    ?: throw Exception("Image file [$path] not loaded: ${stbi_failure_reason()}")
+                texture.setData(texBuffer, w.get(), h.get())
+            }
+        }
 
-    interface AssetLoader {
-        suspend fun load(assetManager: AssetManager, storageAccess: StorageAccess, path: String): Object
+        return texture
     }
 }

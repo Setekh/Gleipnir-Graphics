@@ -40,6 +40,6 @@ import org.koin.dsl.module
 val graphicsModule = module {
     single<RendererContext> { GLFWOpenGLContext() }
     single<Renderer> {
-        DummyRenderer(get(), get())
+        GameGLRenderer(get())
     }
 }

@@ -27,28 +27,62 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.scene.assets
+package eu.corvus.corax.graphics.material.textures
 
-import eu.corvus.corax.app.storage.StorageAccess
-import eu.corvus.corax.graphics.material.textures.Texture
+import eu.corvus.corax.graphics.context.RendererContext
 import eu.corvus.corax.scene.Object
-import eu.corvus.corax.scene.Spatial
+import eu.corvus.corax.utils.height
+import eu.corvus.corax.utils.width
+import org.joml.Vector2i
+import org.koin.core.get
+import org.lwjgl.opengl.GL13.GL_TEXTURE0
+import org.lwjgl.system.MemoryUtil
+import java.lang.RuntimeException
+import java.nio.Buffer
+import java.nio.IntBuffer
 
 /**
  * @author Vlad Ravenholm on 12/28/2019
  */
-interface AssetManager {
-    fun addLoader(suffix: String, assetLoader: AssetLoader)
+abstract class Texture: Object() {
+    open var id: Int = 0
+        protected set
 
-    fun removeLoader(suffix: String)
+    var buffer: Buffer? = null
+        protected set
 
-    suspend fun loadSpatial(assetName: String): Spatial
-    suspend fun loadTexture(assetName: String): Texture
-    suspend fun loadRaw(assetPath: String): ByteArray
+    val isUploaded: Boolean
+        get() = id > 0
 
-    fun unload(assetName: String)
+    val dimensions: Vector2i = Vector2i()
 
-    interface AssetLoader {
-        suspend fun load(assetManager: AssetManager, storageAccess: StorageAccess, path: String): Object
+    val width: Int = dimensions.width
+    val height: Int = dimensions.height
+
+    var generateMipMaps = true
+
+    open fun onAssign(bufferId: Int) {
+        id = bufferId
+    }
+
+    fun setData(buffer: Buffer, width: Int, height: Int) {
+        if (this.buffer != null || isUploaded)
+            throw RuntimeException("Texture already has data")
+
+        this.buffer = buffer
+        dimensions.set(width, height)
+    }
+
+    open fun freeData() {}
+    override fun free() {
+        super.free()
+
+        val renderContext = get<RendererContext>()
+        renderContext.free(this)
+
+        if (buffer != null) {
+            MemoryUtil.memFree(buffer)
+            buffer = null
+        }
     }
 }

@@ -39,10 +39,13 @@ interface Input {
     /**
      * Usually available on desktop, so no need to map keys to any other device or map GLFW to anything else
      */
-    fun keyPress(key: Int, event: KeyEvent)
+    fun keyPress(key: Int, event: InputEvent)
+
+    fun mousePress(button: Int, event: InputEvent)
+    fun mouseMotion(width: Int, height: Int, xpos: Float, ypos: Float)
 }
 
-enum class KeyEvent { Pressed, Released, Repeat }
+enum class InputEvent { Pressed, Released, Repeat, Motion }
 
 enum class Device { Keyboard, Mouse, Controller }
-typealias InputAction = (mapping: String, status: KeyEvent) -> Unit
+typealias InputAction = (mapping: String, status: InputEvent) -> Unit

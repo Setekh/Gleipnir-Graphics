@@ -29,19 +29,28 @@
  */
 package eu.corvus.corax.app
 
+import eu.corvus.corax.graphics.Renderer
+import eu.corvus.corax.graphics.context.RendererContext
 import eu.corvus.corax.scene.graph.SceneGraph
 import eu.corvus.corax.utils.Logger
 import org.koin.core.KoinComponent
+import org.koin.core.inject
+import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL30
 import java.util.*
 
 /**
  * @author Vlad Ravenholm on 11/24/2019
  */
 abstract class GleipnirApplication(
-    val title: String,
-    var timer: Timer,
-    var sceneGraph: SceneGraph
+    val title: String
 ): KoinComponent {
+    val renderer: Renderer by inject()
+    val rendererContext: RendererContext by inject()
+    val sceneGraph: SceneGraph by inject()
+
+    val timer: Timer by inject()
+
     private val enqueuedTasks = LinkedList<Runnable>()
 
     var width: Int = 640
@@ -61,11 +70,16 @@ abstract class GleipnirApplication(
         onResize(width, height)
     }
 
-    open fun onResize(width: Int, height: Int) {}
+    open fun onResize(width: Int, height: Int) {
+        sceneGraph.resizeViewPort(width, height)
+        renderer.onResize(width, height)
+    }
 
     abstract fun onCreate()
 
     open fun onReady() {}
+
+    abstract fun live()
 
     fun update() {
         if (nextNotification < timer.timeInSeconds) {
@@ -96,14 +110,26 @@ abstract class GleipnirApplication(
         }
     }
 
-    open fun onUpdate(tpf: Float)  = Unit
+    open fun onUpdate(tpf: Float) {
+        rendererContext.viewPort(0, 0, width, height)
+        rendererContext.clear(GL30.GL_COLOR_BUFFER_BIT or GL30.GL_DEPTH_BUFFER_BIT or GL11.GL_STENCIL_BUFFER_BIT)
+
+        repeat(sceneGraph.cameras.size) {
+            val camera = sceneGraph.cameras[it]
+            sceneGraph.prepareGraph(camera, tpf)
+
+            renderer.render(camera, sceneGraph.renderBuffer)
+        }
+    }
 
     abstract fun onDestroy()
 
     fun startLifeCycle() {
         onCreate()
         try {
+            renderer.onCreate()
             onReady()
+            live()
         } catch (e: Exception) {
             Logger.error(e, "Fatal crash!")
         } finally {

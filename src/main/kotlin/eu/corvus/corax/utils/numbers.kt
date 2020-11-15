@@ -27,28 +27,38 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.scene.assets
+package eu.corvus.corax.utils
 
-import eu.corvus.corax.app.storage.StorageAccess
-import eu.corvus.corax.graphics.material.textures.Texture
-import eu.corvus.corax.scene.Object
-import eu.corvus.corax.scene.Spatial
+import org.joml.*
+import java.lang.Math
 
 /**
- * @author Vlad Ravenholm on 12/28/2019
+ * @author Vlad Ravenholm on 1/3/2020
  */
-interface AssetManager {
-    fun addLoader(suffix: String, assetLoader: AssetLoader)
 
-    fun removeLoader(suffix: String)
+val MATRIX4f_IDENTITY: Matrix4fc = Matrix4f()
+val VECTOR3f_ZERO: Vector3fc = Vector3f()
 
-    suspend fun loadSpatial(assetName: String): Spatial
-    suspend fun loadTexture(assetName: String): Texture
-    suspend fun loadRaw(assetPath: String): ByteArray
+fun Float.toRadians(): Float = Math.toRadians(this.toDouble()).toFloat()
 
-    fun unload(assetName: String)
+fun Double.toRadians(): Double = Math.toRadians(this)
 
-    interface AssetLoader {
-        suspend fun load(assetManager: AssetManager, storageAccess: StorageAccess, path: String): Object
+var Vector2i.width : Int
+    get() = x
+    set(value) {
+        x = value
     }
+
+var Vector2i.height : Int
+    get() = y
+    set(value) {
+        y = value
+    }
+
+operator fun Vector2i.component1(): Int {
+    return x
+}
+
+operator fun Vector2i.component2(): Int {
+    return y
 }

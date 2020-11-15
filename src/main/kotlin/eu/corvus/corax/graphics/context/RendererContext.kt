@@ -30,10 +30,14 @@
 package eu.corvus.corax.graphics.context
 
 import eu.corvus.corax.graphics.Color
-import eu.corvus.corax.graphics.buffers.BufferObject
 import eu.corvus.corax.graphics.buffers.VertexArrayObject
 import eu.corvus.corax.graphics.buffers.VertexBufferObject
+import eu.corvus.corax.graphics.material.shaders.Shader
+import eu.corvus.corax.graphics.material.textures.Texture
 import eu.corvus.corax.scene.Object
+import eu.corvus.corax.scene.assets.AssetManager
+import org.joml.Vector3fc
+import java.nio.FloatBuffer
 
 /**
  * @author Vlad Ravenholm on 12/21/2019
@@ -74,6 +78,17 @@ interface RendererContext {
     fun unbindBufferObject(vertexBufferObject: VertexBufferObject)
     fun bindBufferObject(vertexBufferObject: VertexBufferObject)
     fun createArrayBufferData(vertexArrayObject: VertexArrayObject)
+    fun createTexture(texture: Texture)
+    fun useTexture(texture: Texture)
     fun free(glObject: Object)
     fun draw(vertexArrayObject: VertexArrayObject)
+
+    fun createProgram(assetManager: AssetManager, shader: Shader)
+    fun useProgram(shader: Shader)
+
+    fun setUniformMatrix4fv(location: Int, transpose: Boolean, fb: FloatBuffer): Unit
+    fun setUniform3f(location: Int, value: Vector3fc)
+    fun setUniform1f(location: Int, value: Float)
+    fun getUniformLocation(programId: Int, name: String): Int
+    fun setUniform1i(location: Int, value: Int)
 }

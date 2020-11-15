@@ -27,7 +27,7 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.scene.assets.loaders
+package eu.corvus.corax.platforms.desktop.assets.loaders
 
 import eu.corvus.corax.app.storage.StorageAccess
 import eu.corvus.corax.scene.Object
@@ -69,8 +69,10 @@ class AssimpLoader : AssetManager.AssetLoader {
                 val geometry = Mesh(aiMesh.mName().dataString())
                 geometry.createMesh(vertexes, indices, texCoords, normals, tangents, bitangents)
                 geometry.forceUpdate()
+
                 spatial.appendChild(geometry)
             }
+            MemoryUtil.memFree(alloc)
         }
 
         return spatial

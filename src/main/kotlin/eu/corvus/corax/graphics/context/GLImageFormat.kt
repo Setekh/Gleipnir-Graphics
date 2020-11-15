@@ -27,23 +27,18 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.graphics.textures
+package eu.corvus.corax.graphics.context
 
-import eu.corvus.corax.graphics.context.RendererContext
-import eu.corvus.corax.scene.Object
-import org.koin.core.get
+import eu.corvus.corax.graphics.material.textures.Format
 
 /**
- * @author Vlad Ravenholm on 12/28/2019
+ * @author Vlad Ravenholm on 1/7/2020
  */
-abstract class Texture: Object() {
-    open var id: Int = 0
-        protected set
+data class GLImageFormat(
+    val internalFormat: Int = 0,
+    val format: Int = 0,
+    val dataType: Int = 0,
+    val compressed: Boolean = false
+)
 
-    override fun free() {
-        super.free()
-
-        val renderContext = get<RendererContext>()
-        renderContext.free(this)
-    }
-}
+val formatToGL = arrayOfNulls<GLImageFormat>(Format.values().size)

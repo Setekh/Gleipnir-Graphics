@@ -27,28 +27,25 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.scene.assets
+package eu.corvus.corax.graphics.context
 
-import eu.corvus.corax.app.storage.StorageAccess
-import eu.corvus.corax.graphics.material.textures.Texture
-import eu.corvus.corax.scene.Object
-import eu.corvus.corax.scene.Spatial
+import eu.corvus.corax.graphics.material.textures.Format
+import org.lwjgl.opengl.GL12.*
 
 /**
- * @author Vlad Ravenholm on 12/28/2019
+ * @author Vlad Ravenholm on 1/6/2020
  */
-interface AssetManager {
-    fun addLoader(suffix: String, assetLoader: AssetLoader)
-
-    fun removeLoader(suffix: String)
-
-    suspend fun loadSpatial(assetName: String): Spatial
-    suspend fun loadTexture(assetName: String): Texture
-    suspend fun loadRaw(assetPath: String): ByteArray
-
-    fun unload(assetName: String)
-
-    interface AssetLoader {
-        suspend fun load(assetManager: AssetManager, storageAccess: StorageAccess, path: String): Object
+internal sealed class GlTextureFormats {
+    companion object {
+        internal fun initialize() {
+            Format.values().forEach {
+                when(it) {
+                    Format.RGBA8 -> formatToGL[it.ordinal] = GLImageFormat(GL_RGBA8, GL_RGB, GL_UNSIGNED_BYTE, false)
+                    Format.ABGR8 -> formatToGL[it.ordinal] = GLImageFormat(GL_RGBA8,  GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, false)
+                    Format.BGR8 -> formatToGL[it.ordinal] = GLImageFormat(GL_RGBA8, GL_BGR, GL_UNSIGNED_BYTE, false)
+                    else -> error("Unknown type! $it")
+                }
+            }
+        }
     }
 }
