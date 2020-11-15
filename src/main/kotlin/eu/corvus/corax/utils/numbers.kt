@@ -29,10 +29,8 @@
  */
 package eu.corvus.corax.utils
 
-import org.joml.Matrix4f
-import org.joml.Matrix4fc
-import org.joml.Vector3f
-import org.joml.Vector3fc
+import org.joml.*
+import java.lang.Math
 
 /**
  * @author Vlad Ravenholm on 1/3/2020
@@ -44,3 +42,23 @@ val VECTOR3f_ZERO: Vector3fc = Vector3f()
 fun Float.toRadians(): Float = Math.toRadians(this.toDouble()).toFloat()
 
 fun Double.toRadians(): Double = Math.toRadians(this)
+
+var Vector2i.width : Int
+    get() = x
+    set(value) {
+        x = value
+    }
+
+var Vector2i.height : Int
+    get() = y
+    set(value) {
+        y = value
+    }
+
+operator fun Vector2i.component1(): Int {
+    return x
+}
+
+operator fun Vector2i.component2(): Int {
+    return y
+}

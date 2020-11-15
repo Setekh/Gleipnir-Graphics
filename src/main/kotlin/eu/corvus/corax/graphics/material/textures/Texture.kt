@@ -31,8 +31,11 @@ package eu.corvus.corax.graphics.material.textures
 
 import eu.corvus.corax.graphics.context.RendererContext
 import eu.corvus.corax.scene.Object
+import org.joml.Vector2i
 import org.koin.core.get
 import org.lwjgl.opengl.GL13.GL_TEXTURE0
+import org.lwjgl.system.MemoryUtil
+import java.nio.Buffer
 import java.nio.IntBuffer
 
 /**
@@ -42,13 +45,28 @@ abstract class Texture: Object() {
     open var id: Int = 0
         protected set
 
+    var buffer: Buffer? = null
+        protected set
+
     val isUploaded: Boolean
         get() = id > 0
+
+    val dimensions: Vector2i = Vector2i()
+
+    open fun onAssign(bufferId: Int) {
+        id = bufferId
+    }
 
     override fun free() {
         super.free()
 
         val renderContext = get<RendererContext>()
         renderContext.free(this)
+
+
+        if (buffer != null) {
+            MemoryUtil.memFree(buffer)
+            buffer = null
+        }
     }
 }

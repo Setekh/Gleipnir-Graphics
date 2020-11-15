@@ -7,11 +7,13 @@ uniform mat4 modelMatrix;
 uniform vec3 eye;
 
 layout (location = 0) in vec3 position;
-layout (location = 2) in vec3 normal;
+layout (location = 1) in vec2 tCoord;
+layout (location = 3) in vec3 normal;
 
 out vec3 norm;
 out vec3 peye;
 out vec3 pos;
+out vec2 TexCoord;
 
 void main() {
     vec4 modelProj = modelMatrix * vec4(position, 1.0);
@@ -24,4 +26,6 @@ void main() {
     peye = mat3(viewMatrix) * peye;
 
     gl_Position = viewProjectionMatrix * modelProj;
+
+    TexCoord = tCoord;
 }

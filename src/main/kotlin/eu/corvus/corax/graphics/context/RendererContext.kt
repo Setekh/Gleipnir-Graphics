@@ -33,6 +33,7 @@ import eu.corvus.corax.graphics.Color
 import eu.corvus.corax.graphics.buffers.VertexArrayObject
 import eu.corvus.corax.graphics.buffers.VertexBufferObject
 import eu.corvus.corax.graphics.material.shaders.Shader
+import eu.corvus.corax.graphics.material.textures.Texture
 import eu.corvus.corax.scene.Object
 import eu.corvus.corax.scene.assets.AssetManager
 import org.joml.Vector3fc
@@ -77,6 +78,7 @@ interface RendererContext {
     fun unbindBufferObject(vertexBufferObject: VertexBufferObject)
     fun bindBufferObject(vertexBufferObject: VertexBufferObject)
     fun createArrayBufferData(vertexArrayObject: VertexArrayObject)
+    fun createTexture(texture: Texture)
     fun free(glObject: Object)
     fun draw(vertexArrayObject: VertexArrayObject)
 

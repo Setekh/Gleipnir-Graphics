@@ -9,12 +9,17 @@ import eu.corvus.corax.graphics.material.textures.Texture
 import eu.corvus.corax.scene.Object
 import eu.corvus.corax.scene.assets.AssetManager
 import eu.corvus.corax.utils.Logger
+import eu.corvus.corax.utils.component1
+import eu.corvus.corax.utils.component2
 import kotlinx.coroutines.runBlocking
+import org.joml.Vector2i
 import org.joml.Vector3fc
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL15
 import org.lwjgl.opengl.GL20
 import org.lwjgl.opengl.GL30.*
+import org.lwjgl.stb.STBImage.stbi_image_free
+import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 import java.nio.IntBuffer
 
@@ -118,6 +123,25 @@ class GLFWOpenGLContext : RendererContext {
             }
             bufferObject.clearData()
         }
+    }
+
+    override fun createTexture(texture: Texture) {
+        val id = GL11.glGenTextures()
+        glBindTexture(GL_TEXTURE_2D, id)
+        texture.onAssign(id)
+
+        // set the texture wrapping/filtering options (on the currently bound texture object)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
+        val (width, height) = texture.dimensions
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
+            0, GL_RGBA, GL_UNSIGNED_BYTE, texture.buffer as ByteBuffer)
+
+        stbi_image_free(texture.buffer as ByteBuffer)
     }
 
     private fun createIndexBufferData(bufferObject: IndexBuffer) {

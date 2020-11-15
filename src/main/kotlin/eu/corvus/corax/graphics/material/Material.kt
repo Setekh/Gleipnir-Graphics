@@ -29,10 +29,12 @@
  */
 package eu.corvus.corax.graphics.material
 
+import eu.corvus.corax.graphics.context.RendererContext
 import eu.corvus.corax.graphics.material.shaders.Shader
 import eu.corvus.corax.graphics.material.textures.Texture
 import eu.corvus.corax.scene.Camera
 import eu.corvus.corax.scene.Object
+import eu.corvus.corax.scene.assets.AssetManager
 import eu.corvus.corax.scene.geometry.Geometry
 import eu.corvus.corax.utils.Logger
 import org.joml.Matrix4f
@@ -82,4 +84,9 @@ abstract class Material: Object() {
     private fun updateParam(name: String, value: Any) {
     }
 
+    open fun prepareUpload(assetManager: AssetManager, rendererContext: RendererContext) {
+        if (!shader.isUploaded) {
+            rendererContext.createProgram(assetManager, shader) // TODO maybe create shaders at start up?
+        }
+    }
 }

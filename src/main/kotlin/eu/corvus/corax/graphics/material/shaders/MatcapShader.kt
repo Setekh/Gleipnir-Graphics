@@ -4,7 +4,7 @@ class MatcapShader : Shader() {
     val viewProjection = Mat4fUniform("viewProjectionMatrix")
     val viewMatrix = Mat4fUniform("viewMatrix")
     val modelMatrix = Mat4fUniform("modelMatrix")
-    val texture = Mat4fUniform("texture")
+    val texture = IntUniform("texture")
 
     override val uniforms = arrayOf(viewProjection, viewMatrix, modelMatrix, texture)
 

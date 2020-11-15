@@ -2,11 +2,14 @@ package eu.corvus.corax.scene.assets
 
 import eu.corvus.corax.app.storage.StorageAccess
 import eu.corvus.corax.graphics.material.textures.Texture
+import eu.corvus.corax.graphics.material.textures.Texture2D
 import eu.corvus.corax.scene.Object
 import eu.corvus.corax.scene.Spatial
 import eu.corvus.corax.scene.assets.loaders.AssimpLoader
+import eu.corvus.corax.scene.assets.loaders.TextureLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.lang.RuntimeException
 import kotlin.properties.Delegates
 
 class AssetManagerImpl(
@@ -15,6 +18,8 @@ class AssetManagerImpl(
     private val loaders = mutableMapOf<String, AssetManager.AssetLoader>()
 
     init {
+        addLoader("png", TextureLoader())
+        addLoader("jpg", TextureLoader())
         addLoader("*", AssimpLoader())
     }
 
@@ -33,8 +38,11 @@ class AssetManagerImpl(
         assetLoader.load(this@AssetManagerImpl, storageAccess, assetName) as Spatial
     }
 
-    override suspend fun loadTexture(assetName: String): Texture {
-        TODO()
+    override suspend fun loadTexture(assetName: String): Texture = withContext(Dispatchers.IO) {
+        val suffix = assetName.substringAfterLast('.')
+        val assetLoader = loaders[suffix] ?: throw RuntimeException("Cannot find asset loader for $assetName")
+
+        assetLoader.load(this@AssetManagerImpl, storageAccess, assetName) as Texture2D
     }
 
     override suspend fun loadRaw(assetPath: String): ByteArray = withContext(Dispatchers.IO) { // this is not cache-able

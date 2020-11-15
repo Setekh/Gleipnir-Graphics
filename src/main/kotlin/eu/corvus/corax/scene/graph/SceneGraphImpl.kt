@@ -137,10 +137,7 @@ class SceneGraphImpl(
                         rendererContext.createArrayBufferData(vao)
                 }
 
-                val shader = scene.material.shader
-                if (!shader.isUploaded) {
-                    rendererContext.createProgram(assetManager, shader) // TODO maybe create shaders at start up?
-                }
+                scene.material.prepareUpload(assetManager, rendererContext)
 
                 renderBuffer.put(scene)
             }

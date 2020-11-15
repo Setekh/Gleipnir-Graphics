@@ -72,6 +72,7 @@ class AssimpLoader : AssetManager.AssetLoader {
 
                 spatial.appendChild(geometry)
             }
+            MemoryUtil.memFree(alloc)
         }
 
         return spatial

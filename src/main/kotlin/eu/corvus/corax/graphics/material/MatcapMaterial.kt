@@ -29,28 +29,55 @@
  */
 package eu.corvus.corax.graphics.material
 
+import eu.corvus.corax.graphics.context.RendererContext
 import eu.corvus.corax.graphics.material.shaders.MatcapShader
+import eu.corvus.corax.graphics.material.textures.Texture
 import eu.corvus.corax.scene.Camera
 import eu.corvus.corax.scene.assets.AssetManager
 import eu.corvus.corax.scene.geometry.Geometry
 import kotlinx.coroutines.runBlocking
 import org.koin.core.KoinComponent
 import org.koin.core.get
+import org.lwjgl.opengl.GL11.GL_TEXTURE_2D
+import org.lwjgl.opengl.GL11.glBindTexture
+import org.lwjgl.opengl.GL13.GL_TEXTURE0
+import org.lwjgl.opengl.GL13.glActiveTexture
 
 /**
  * @author Vlad Ravenholm on 1/6/2020
  */
 class MatcapMaterial: Material(), KoinComponent {
     override val shader = MatcapShader()
+    var textureParam: String? = "textures/matcap.png"
+    var texture: Texture? = null
 
     override fun applyParams(camera: Camera, geometry: Geometry) {
         shader.setUniformValue(shader.viewMatrix, camera.viewMatrix)
         shader.setUniformValue(shader.viewProjection, camera.viewProjectionMatrix)
         shader.setUniformValue(shader.modelMatrix, geometry.worldMatrix)
 
-        //shader.setUniformValue(shader.texture, texture)
+        val texture = texture ?: return
+        shader.setUniformValue(shader.texture, 0)
 
-        val loadTexture = runBlocking { get<AssetManager>().loadTexture("textures/matcap.png") }
-        shader.setUniformValue(shader.texture, loadTexture)
+        glBindTexture(GL_TEXTURE_2D, texture.id)
+        glActiveTexture(GL_TEXTURE0)
+    }
+
+    override fun prepareUpload(assetManager: AssetManager, rendererContext: RendererContext) {
+        super.prepareUpload(assetManager, rendererContext)
+
+        if (texture != null && !texture!!.isUploaded) {
+            rendererContext.createTexture(texture!!)
+            return
+        }
+
+        if (texture == null) {
+            val textureParam = textureParam ?: return
+            val texture = runBlocking { assetManager.loadTexture(textureParam) }
+
+            this.texture = texture
+
+            rendererContext.createTexture(texture)
+        }
     }
 }
