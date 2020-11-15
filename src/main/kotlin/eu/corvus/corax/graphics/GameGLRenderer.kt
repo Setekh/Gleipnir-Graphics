@@ -61,6 +61,9 @@ class GameGLRenderer(
     }
 
     override fun render(camera: Camera, renderBuffer: ItemBuffer<Geometry>) {
+        rendererContext.viewPort(0, 0, camera.width, camera.height)
+        rendererContext.clear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT or GL11.GL_STENCIL_BUFFER_BIT)
+
         repeat(renderBuffer.limit) {
             val geometry = renderBuffer.get()
             val vertexArrayObject = geometry.vertexArrayObject!!

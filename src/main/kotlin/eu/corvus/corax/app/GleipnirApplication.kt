@@ -73,8 +73,6 @@ abstract class GleipnirApplication(
     open fun onResize(width: Int, height: Int) {
         sceneGraph.resizeViewPort(width, height)
         renderer.onResize(width, height)
-
-        // TODO Emit resize event
     }
 
     abstract fun onCreate()
