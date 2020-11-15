@@ -48,4 +48,4 @@ interface Input {
 enum class InputEvent { Pressed, Released, Repeat, Motion }
 
 enum class Device { Keyboard, Mouse, Controller }
-typealias InputAction = (mapping: String, status: InputEvent) -> Unit
+typealias InputAction = (mapping: String, event: InputEvent) -> Unit

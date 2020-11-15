@@ -29,9 +29,11 @@
  */
 package eu.corvus.corax.platforms.desktop
 
+import eu.corvus.corax.app.Device
 import eu.corvus.corax.app.GleipnirApplication
 import eu.corvus.corax.app.Input
 import eu.corvus.corax.app.InputEvent
+import eu.corvus.corax.scene.Spatial
 import eu.corvus.corax.scene.graph.SceneGraph
 import eu.corvus.corax.utils.Logger
 import org.koin.core.inject
@@ -96,6 +98,7 @@ class DesktopApp(
             if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
                 glfwSetWindowShouldClose(window, true) // We will detect this in the rendering loop
 
+            // TODO need to queue this and make them in sync with the main loop, to access delta time
             input.keyPress(key, when(action) {
                 GLFW_PRESS -> InputEvent.Pressed
                 GLFW_RELEASE -> InputEvent.Released
@@ -167,6 +170,16 @@ class DesktopApp(
     override fun onReady() {
         val sceneGraph by inject<SceneGraph>()
         sceneGraph.loadScene("test-models/suz.dae")
+
+
+        val action = { mapping: String, event: InputEvent ->
+            val spatial = sceneGraph.sceneTree.children[0] as Spatial
+            spatial.transform.rotation.rotateY(Math.toRadians(if (mapping === "turn left") -15.0 else 15.0).toFloat())
+            spatial.forceUpdate()
+        }
+
+        input.map(Device.Keyboard, GLFW_KEY_LEFT, "turn left", action)
+        input.map(Device.Keyboard, GLFW_KEY_RIGHT, "turn right", action)
 
         // TODO config this
         //glEnable(GL_MULTISAMPLE)
