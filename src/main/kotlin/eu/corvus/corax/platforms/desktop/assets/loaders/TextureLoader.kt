@@ -27,10 +27,10 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.scene.assets.loaders
+package eu.corvus.corax.platforms.desktop.assets.loaders
 
 import eu.corvus.corax.app.storage.StorageAccess
-import eu.corvus.corax.graphics.material.textures.Texture2D
+import eu.corvus.corax.graphics.material.textures.Texture2D_PC
 import eu.corvus.corax.scene.Object
 import eu.corvus.corax.scene.assets.AssetManager
 import org.joml.Vector2i
@@ -45,8 +45,7 @@ import java.nio.Buffer
  */
 class TextureLoader : AssetManager.AssetLoader {
     override suspend fun load(assetManager: AssetManager, storageAccess: StorageAccess, path: String): Object {
-        var texBuffer: Buffer? = null
-        val texSize: Vector2i = Vector2i()
+        val texture = Texture2D_PC()
 
         storageAccess.readFrom(path) { stream ->
             MemoryStack.stackPush().use { stack ->
@@ -58,17 +57,12 @@ class TextureLoader : AssetManager.AssetLoader {
                 val h = stack.mallocInt(1)
                 val channels = stack.mallocInt(1)
 
-                texBuffer = stbi_load_from_memory(buffer, w, h, channels, 4)
-                if (texBuffer == null) {
-                    throw Exception("Image file [$path] not loaded: ${stbi_failure_reason()}");
-                }
-                texSize.set(w.get(), h.get())
+                val texBuffer = stbi_load_from_memory(buffer, w, h, channels, 4)
+                    ?: throw Exception("Image file [$path] not loaded: ${stbi_failure_reason()}")
+                texture.setData(texBuffer, w.get(), h.get())
             }
         }
 
-        return Texture2D().apply {
-            withData(texBuffer!!)
-            dimensions.set(texSize)
-        }
+        return texture
     }
 }

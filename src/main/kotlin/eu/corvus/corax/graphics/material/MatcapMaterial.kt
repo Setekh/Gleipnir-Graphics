@@ -37,11 +37,6 @@ import eu.corvus.corax.scene.assets.AssetManager
 import eu.corvus.corax.scene.geometry.Geometry
 import kotlinx.coroutines.runBlocking
 import org.koin.core.KoinComponent
-import org.koin.core.get
-import org.lwjgl.opengl.GL11.GL_TEXTURE_2D
-import org.lwjgl.opengl.GL11.glBindTexture
-import org.lwjgl.opengl.GL13.GL_TEXTURE0
-import org.lwjgl.opengl.GL13.glActiveTexture
 
 /**
  * @author Vlad Ravenholm on 1/6/2020
@@ -51,7 +46,11 @@ class MatcapMaterial: Material(), KoinComponent {
     var textureParam: String? = "textures/matcap.png"
     var texture: Texture? = null
 
-    override fun applyParams(camera: Camera, geometry: Geometry) {
+    override fun applyParams(
+        renderContext: RendererContext,
+        camera: Camera,
+        geometry: Geometry
+    ) {
         shader.setUniformValue(shader.viewMatrix, camera.viewMatrix)
         shader.setUniformValue(shader.viewProjection, camera.viewProjectionMatrix)
         shader.setUniformValue(shader.modelMatrix, geometry.worldMatrix)
@@ -59,8 +58,7 @@ class MatcapMaterial: Material(), KoinComponent {
         val texture = texture ?: return
         shader.setUniformValue(shader.texture, 0)
 
-        glBindTexture(GL_TEXTURE_2D, texture.id)
-        glActiveTexture(GL_TEXTURE0)
+        renderContext.useTexture(texture)
     }
 
     override fun prepareUpload(assetManager: AssetManager, rendererContext: RendererContext) {

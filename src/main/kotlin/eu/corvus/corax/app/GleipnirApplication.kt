@@ -30,10 +30,13 @@
 package eu.corvus.corax.app
 
 import eu.corvus.corax.graphics.Renderer
+import eu.corvus.corax.graphics.context.RendererContext
 import eu.corvus.corax.scene.graph.SceneGraph
 import eu.corvus.corax.utils.Logger
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL30
 import java.util.*
 
 /**
@@ -43,6 +46,7 @@ abstract class GleipnirApplication(
     val title: String
 ): KoinComponent {
     val renderer: Renderer by inject()
+    val rendererContext: RendererContext by inject()
     val sceneGraph: SceneGraph by inject()
 
     val timer: Timer by inject()
@@ -109,6 +113,9 @@ abstract class GleipnirApplication(
     }
 
     open fun onUpdate(tpf: Float) {
+        rendererContext.viewPort(0, 0, width, height)
+        rendererContext.clear(GL30.GL_COLOR_BUFFER_BIT or GL30.GL_DEPTH_BUFFER_BIT or GL11.GL_STENCIL_BUFFER_BIT)
+
         repeat(sceneGraph.cameras.size) {
             val camera = sceneGraph.cameras[it]
             sceneGraph.prepareGraph(camera, tpf)

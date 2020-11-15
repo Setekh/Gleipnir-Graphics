@@ -30,10 +30,10 @@
 package eu.corvus.corax.app
 
 import eu.corvus.corax.app.input.AppInput
-import eu.corvus.corax.app.shells.DesktopApp
 import eu.corvus.corax.app.storage.DesktopStorageAccess
 import eu.corvus.corax.app.storage.StorageAccess
 import eu.corvus.corax.app.timers.NanoTimer
+import eu.corvus.corax.platforms.desktop.DesktopApp
 import org.koin.dsl.module
 
 /**

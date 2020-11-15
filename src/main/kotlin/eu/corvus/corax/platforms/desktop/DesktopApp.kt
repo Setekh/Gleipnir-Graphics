@@ -27,7 +27,7 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.corvus.corax.app.shells
+package eu.corvus.corax.platforms.desktop
 
 import eu.corvus.corax.app.GleipnirApplication
 import eu.corvus.corax.app.Input
@@ -123,9 +123,6 @@ class DesktopApp(
 
             // Get the window size passed to glfwCreateWindow
             glfwGetWindowSize(window, pWidth, pHeight)
-            val width = pWidth.get(0)
-            val height = pHeight.get(0)
-            resize(width, height)
 
             // Get the resolution of the primary monitor
             val vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor())
@@ -152,12 +149,26 @@ class DesktopApp(
         // creates the GLCapabilities instance and makes the OpenGL
         // bindings available for use.
         GL.createCapabilities()
+
+        resizeWithFrameBuffer()
+    }
+
+    private fun resizeWithFrameBuffer() {
+        stackPush().use { stack ->
+            val pWidth = stack.mallocInt(1) // int*
+            val pHeight = stack.mallocInt(1) // int*
+
+            glfwGetFramebufferSize(window, pWidth, pHeight)
+
+            resize(pWidth.get(), pHeight.get())
+        }
     }
 
     override fun onReady() {
         val sceneGraph by inject<SceneGraph>()
         sceneGraph.loadScene("test-models/suz.dae")
 
+        // TODO config this
         //glEnable(GL_MULTISAMPLE)
     }
 

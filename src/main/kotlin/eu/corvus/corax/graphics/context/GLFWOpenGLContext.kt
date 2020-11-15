@@ -3,7 +3,9 @@ package eu.corvus.corax.graphics.context
 import eu.corvus.corax.graphics.*
 import eu.corvus.corax.graphics.buffers.VertexArrayObject
 import eu.corvus.corax.graphics.buffers.VertexBufferObject
-import eu.corvus.corax.graphics.buffers.types.*
+import eu.corvus.corax.graphics.buffers.types.BufferType
+import eu.corvus.corax.graphics.buffers.types.IndexBuffer
+import eu.corvus.corax.graphics.buffers.types.data
 import eu.corvus.corax.graphics.material.shaders.Shader
 import eu.corvus.corax.graphics.material.textures.Texture
 import eu.corvus.corax.scene.Object
@@ -12,9 +14,9 @@ import eu.corvus.corax.utils.Logger
 import eu.corvus.corax.utils.component1
 import eu.corvus.corax.utils.component2
 import kotlinx.coroutines.runBlocking
-import org.joml.Vector2i
 import org.joml.Vector3fc
 import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL13
 import org.lwjgl.opengl.GL15
 import org.lwjgl.opengl.GL20
 import org.lwjgl.opengl.GL30.*
@@ -115,11 +117,11 @@ class GLFWOpenGLContext : RendererContext {
 
             bufferObject.onAssign(id)
             when (bufferObject) {
-                is VertexBuffer, is TextureCoordsBuffer, is NormalBuffer, is TangentBuffer, is BiTangentBuffer -> createFloatBufferData(
+                is IndexBuffer -> createIndexBufferData(bufferObject)
+                else -> createFloatBufferData(
                     bufferObject.type.ordinal,
                     bufferObject
                 )
-                is IndexBuffer -> createIndexBufferData(bufferObject)
             }
             bufferObject.clearData()
         }
@@ -130,18 +132,28 @@ class GLFWOpenGLContext : RendererContext {
         glBindTexture(GL_TEXTURE_2D, id)
         texture.onAssign(id)
 
-        // set the texture wrapping/filtering options (on the currently bound texture object)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        // TODO Move this in texture
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
+
         val (width, height) = texture.dimensions
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
             0, GL_RGBA, GL_UNSIGNED_BYTE, texture.buffer as ByteBuffer)
 
-        stbi_image_free(texture.buffer as ByteBuffer)
+        if (texture.generateMipMaps) {
+            glGenerateMipmap(GL_TEXTURE_2D)
+        }
+
+        texture.freeData()
+    }
+
+    override fun useTexture(texture: Texture) {
+        glBindTexture(GL11.GL_TEXTURE_2D, texture.id)
+        glActiveTexture(GL13.GL_TEXTURE0)
     }
 
     private fun createIndexBufferData(bufferObject: IndexBuffer) {

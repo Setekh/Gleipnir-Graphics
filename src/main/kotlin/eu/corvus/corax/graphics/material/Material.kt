@@ -48,7 +48,11 @@ import org.joml.Vector3f
 abstract class Material: Object() {
     abstract val shader: Shader
 
-    abstract fun applyParams(camera: Camera, geometry: Geometry)
+    abstract fun applyParams(
+        renderContext: RendererContext,
+        camera: Camera,
+        geometry: Geometry
+    )
 
     /**
      * For direct access

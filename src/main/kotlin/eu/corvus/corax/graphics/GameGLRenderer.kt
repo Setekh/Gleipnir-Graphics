@@ -56,15 +56,11 @@ class GameGLRenderer(
         // Set the clear color
         rendererContext.clearColor(viewPortColor)
 
-        //glEnable(GL_CULL_FACE)
+        //glEnable(GL_CULL_FACE) //TODO move these to material
         //glCullFace(GL_BACK)
-
     }
 
     override fun render(camera: Camera, renderBuffer: ItemBuffer<Geometry>) {
-        rendererContext.viewPort(0, 0, camera.width, camera.height)
-        rendererContext.clear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT or GL11.GL_STENCIL_BUFFER_BIT)
-
         repeat(renderBuffer.limit) {
             val geometry = renderBuffer.get()
             val vertexArrayObject = geometry.vertexArrayObject!!
@@ -79,7 +75,7 @@ class GameGLRenderer(
                 rendererContext.useProgram(shader)
             }
 
-            material.applyParams(camera, geometry)
+            material.applyParams(rendererContext, camera, geometry)
 
             rendererContext.bindBufferArray(vertexArrayObject)
             rendererContext.draw(vertexArrayObject)

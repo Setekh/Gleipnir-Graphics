@@ -79,6 +79,7 @@ interface RendererContext {
     fun bindBufferObject(vertexBufferObject: VertexBufferObject)
     fun createArrayBufferData(vertexArrayObject: VertexArrayObject)
     fun createTexture(texture: Texture)
+    fun useTexture(texture: Texture)
     fun free(glObject: Object)
     fun draw(vertexArrayObject: VertexArrayObject)
 
