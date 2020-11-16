@@ -31,12 +31,13 @@ package eu.corvus.corax.graphics.material
 
 import eu.corvus.corax.graphics.context.RendererContext
 import eu.corvus.corax.graphics.material.shaders.Shader
-import eu.corvus.corax.graphics.material.textures.Texture
 import eu.corvus.corax.scene.Camera
 import eu.corvus.corax.scene.Object
 import eu.corvus.corax.scene.assets.AssetManager
 import eu.corvus.corax.scene.geometry.Geometry
 import eu.corvus.corax.utils.Logger
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 import org.joml.Matrix4f
 import org.joml.Vector3f
 
@@ -47,6 +48,7 @@ import org.joml.Vector3f
  */
 abstract class Material: Object() {
     abstract val shader: Shader
+    protected val scope = MainScope()
 
     abstract fun applyParams(
         renderContext: RendererContext,
@@ -82,15 +84,22 @@ abstract class Material: Object() {
         updateParam(name, value)
     }
 
-    fun setParam(name: String, value: Texture) {
-    }
+    @Suppress("UNCHECKED_CAST")
+    private fun <T: Any> updateParam(name: String, value: T) {
+        val uniform = shader.findUniform(name) as? Shader.Uniform<T>
+            ?: return let { Logger.warn("Missing param $name") }
 
-    private fun updateParam(name: String, value: Any) {
+        shader.setUniformValue(uniform, value)
     }
 
     open fun prepareUpload(assetManager: AssetManager, rendererContext: RendererContext) {
         if (!shader.isUploaded) {
             rendererContext.createProgram(assetManager, shader) // TODO maybe create shaders at start up?
         }
+    }
+
+    override fun free() {
+        super.free()
+        scope.cancel()
     }
 }

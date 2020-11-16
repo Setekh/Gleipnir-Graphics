@@ -35,7 +35,8 @@ import eu.corvus.corax.graphics.material.textures.Texture
 import eu.corvus.corax.scene.Camera
 import eu.corvus.corax.scene.assets.AssetManager
 import eu.corvus.corax.scene.geometry.Geometry
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import org.koin.core.KoinComponent
 
 /**
@@ -43,8 +44,8 @@ import org.koin.core.KoinComponent
  */
 class MatcapMaterial: Material(), KoinComponent {
     override val shader = MatcapShader()
-    var textureParam: String? = "textures/matcap.png"
     var texture: Texture? = null
+    var isLoadingTexture = false
 
     override fun applyParams(
         renderContext: RendererContext,
@@ -57,25 +58,29 @@ class MatcapMaterial: Material(), KoinComponent {
 
         val texture = texture ?: return
         shader.setUniformValue(shader.texture, 0)
-
-        renderContext.useTexture(texture)
+        renderContext.useTexture(texture, 0)
     }
 
     override fun prepareUpload(assetManager: AssetManager, rendererContext: RendererContext) {
         super.prepareUpload(assetManager, rendererContext)
 
-        if (texture != null && !texture!!.isUploaded) {
-            rendererContext.createTexture(texture!!)
-            return
+        val texture = texture
+        if (texture == null && !isLoadingTexture) {
+            isLoadingTexture = true
+
+            scope.launch {
+                this@MatcapMaterial.texture = assetManager.loadTexture("textures/matcap.png")
+            }
         }
 
-        if (texture == null) {
-            val textureParam = textureParam ?: return
-            val texture = runBlocking { assetManager.loadTexture(textureParam) }
-
-            this.texture = texture
-
+        if (texture != null && !texture.isUploaded) {
             rendererContext.createTexture(texture)
         }
+    }
+
+    override fun free() {
+        super.free()
+
+        texture?.free()
     }
 }

@@ -29,8 +29,8 @@
  */
 package eu.corvus.corax.graphics
 
-import eu.corvus.corax.graphics.context.GLFWOpenGLContext
 import eu.corvus.corax.graphics.context.RendererContext
+import eu.corvus.corax.platforms.desktop.graphics.context.GLFWOpenGLContext
 import org.koin.dsl.module
 
 /**

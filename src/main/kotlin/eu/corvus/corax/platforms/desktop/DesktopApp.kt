@@ -171,7 +171,6 @@ class DesktopApp(
         val sceneGraph by inject<SceneGraph>()
         sceneGraph.loadScene("test-models/suz.dae")
 
-
         val action = { mapping: String, event: InputEvent ->
             val spatial = sceneGraph.sceneTree.children[0] as Spatial
             spatial.transform.rotation.rotateY(Math.toRadians(if (mapping === "turn left") -15.0 else 15.0).toFloat())

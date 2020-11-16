@@ -1,4 +1,4 @@
-package eu.corvus.corax.graphics.context
+package eu.corvus.corax.platforms.desktop.graphics.context
 
 import eu.corvus.corax.graphics.*
 import eu.corvus.corax.graphics.buffers.VertexArrayObject
@@ -6,6 +6,8 @@ import eu.corvus.corax.graphics.buffers.VertexBufferObject
 import eu.corvus.corax.graphics.buffers.types.BufferType
 import eu.corvus.corax.graphics.buffers.types.IndexBuffer
 import eu.corvus.corax.graphics.buffers.types.data
+import eu.corvus.corax.graphics.context.GlTextureFormats
+import eu.corvus.corax.graphics.context.RendererContext
 import eu.corvus.corax.graphics.material.shaders.Shader
 import eu.corvus.corax.graphics.material.textures.Texture
 import eu.corvus.corax.scene.Object
@@ -20,7 +22,6 @@ import org.lwjgl.opengl.GL13
 import org.lwjgl.opengl.GL15
 import org.lwjgl.opengl.GL20
 import org.lwjgl.opengl.GL30.*
-import org.lwjgl.stb.STBImage.stbi_image_free
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 import java.nio.IntBuffer
@@ -151,9 +152,9 @@ class GLFWOpenGLContext : RendererContext {
         texture.freeData()
     }
 
-    override fun useTexture(texture: Texture) {
+    override fun useTexture(texture: Texture, position: Int) {
         glBindTexture(GL11.GL_TEXTURE_2D, texture.id)
-        glActiveTexture(GL13.GL_TEXTURE0)
+        glActiveTexture(texturePositions[position])
     }
 
     private fun createIndexBufferData(bufferObject: IndexBuffer) {

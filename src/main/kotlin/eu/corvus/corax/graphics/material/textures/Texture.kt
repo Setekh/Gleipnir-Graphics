@@ -74,11 +74,14 @@ abstract class Texture: Object() {
     }
 
     open fun freeData() {}
+
     override fun free() {
         super.free()
 
         val renderContext = get<RendererContext>()
         renderContext.free(this)
+
+        freeData()
 
         if (buffer != null) {
             MemoryUtil.memFree(buffer)
