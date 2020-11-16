@@ -81,13 +81,15 @@ interface RendererContext {
     fun createArrayBufferData(vertexArrayObject: VertexArrayObject)
     fun createTexture(texture: Texture)
     fun useTexture(texture: Texture, position: Int)
+    fun unbindTexture(texture: Texture)
     fun free(glObject: Object)
     fun draw(vertexArrayObject: VertexArrayObject)
 
     fun createProgram(assetManager: AssetManager, shader: Shader)
     fun useProgram(shader: Shader)
 
-    fun setUniformMatrix4fv(location: Int, transpose: Boolean, fb: FloatBuffer): Unit
+    fun setUniformMatrix3fv(location: Int, transpose: Boolean, fb: FloatBuffer)
+    fun setUniformMatrix4fv(location: Int, transpose: Boolean, fb: FloatBuffer)
     fun setUniform3f(location: Int, value: Vector3fc)
     fun setUniform4f(location: Int, value: Vector4fc)
     fun setUniform1f(location: Int, value: Float)

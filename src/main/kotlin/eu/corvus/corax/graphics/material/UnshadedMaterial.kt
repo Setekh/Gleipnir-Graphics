@@ -65,6 +65,11 @@ class UnshadedMaterial(private var textureAsset: String? = null, val color: Vect
         renderContext.useTexture(texture, 0)
     }
 
+    override fun cleanRender(renderContext: RendererContext) {
+        val texture = texture ?: return
+        renderContext.unbindTexture(texture)
+    }
+
     override fun prepareUpload(assetManager: AssetManager, rendererContext: RendererContext) {
         super.prepareUpload(assetManager, rendererContext)
 
@@ -75,6 +80,8 @@ class UnshadedMaterial(private var textureAsset: String? = null, val color: Vect
             loadingTexture = textureAsset
 
             texture?.free() //TODO track inside it how many refs it has
+            cleanRender(rendererContext)
+
             this.texture = null
 
             scope.launch {

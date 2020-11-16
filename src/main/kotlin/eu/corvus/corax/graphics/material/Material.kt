@@ -56,6 +56,8 @@ abstract class Material: Object() {
         geometry: Geometry
     )
 
+    open fun cleanRender(renderContext: RendererContext) {}
+
     /**
      * For direct access
      *

@@ -2,6 +2,7 @@ package eu.corvus.corax.graphics.material.shaders
 
 import eu.corvus.corax.graphics.context.RendererContext
 import eu.corvus.corax.scene.Object
+import org.joml.Matrix3fc
 import org.joml.Matrix4fc
 import org.joml.Vector3fc
 import org.joml.Vector4fc
@@ -57,6 +58,17 @@ abstract class Shader: Object() {
 
     class Vec4fUniform(name: String) : Uniform<Vector4fc>(name) {
         override fun setValue(rendererContext: RendererContext, value: Vector4fc) = rendererContext.setUniform4f(uniformLocation, value)
+    }
+
+    class Mat3fUniform(name: String) : Uniform<Matrix3fc>(name) {
+        override fun setValue(rendererContext: RendererContext, value: Matrix3fc) {
+            MemoryStack.stackPush().use { stack ->
+                val fb = stack.mallocFloat(16)
+                value.get(fb)
+
+                rendererContext.setUniformMatrix3fv(uniformLocation, false, fb)
+            }
+        }
     }
 
     class Mat4fUniform(name: String) : Uniform<Matrix4fc>(name) {

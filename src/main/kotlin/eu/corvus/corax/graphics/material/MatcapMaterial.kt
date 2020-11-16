@@ -37,6 +37,8 @@ import eu.corvus.corax.scene.assets.AssetManager
 import eu.corvus.corax.scene.geometry.Geometry
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import org.joml.Matrix3f
+import org.joml.Matrix4f
 import org.koin.core.KoinComponent
 
 /**
@@ -47,18 +49,30 @@ class MatcapMaterial: Material(), KoinComponent {
     var texture: Texture? = null
     var isLoadingTexture = false
 
+    private val tempMatrix = Matrix4f()
+    private val normalMatrix = Matrix3f()
+
     override fun applyParams(
         renderContext: RendererContext,
         camera: Camera,
         geometry: Geometry
     ) {
-        shader.setUniformValue(shader.viewMatrix, camera.viewMatrix)
         shader.setUniformValue(shader.viewProjection, camera.viewProjectionMatrix)
         shader.setUniformValue(shader.modelMatrix, geometry.worldMatrix)
+        shader.setUniformValue(shader.viewMatrix, camera.viewMatrix)
+        shader.setUniformValue(shader.eye, camera.dir)
+
+        val GG = tempMatrix.set(camera.viewMatrix).mul(geometry.worldMatrix).invert().transpose()
+        shader.setUniformValue(shader.normalMatrix, GG)
 
         val texture = texture ?: return
         shader.setUniformValue(shader.texture, 0)
         renderContext.useTexture(texture, 0)
+    }
+
+    override fun cleanRender(renderContext: RendererContext) {
+        val texture = texture ?: return
+        renderContext.unbindTexture(texture)
     }
 
     override fun prepareUpload(assetManager: AssetManager, rendererContext: RendererContext) {
@@ -69,7 +83,7 @@ class MatcapMaterial: Material(), KoinComponent {
             isLoadingTexture = true
 
             scope.launch {
-                this@MatcapMaterial.texture = assetManager.loadTexture("textures/matcap.png")
+                this@MatcapMaterial.texture = assetManager.loadTexture("textures/matcap2.png")
             }
         }
 

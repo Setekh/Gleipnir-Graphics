@@ -158,6 +158,10 @@ class GLFWOpenGLContext : RendererContext {
         glActiveTexture(texturePositions[position])
     }
 
+    override fun unbindTexture(texture: Texture) {
+        glBindTexture(GL11.GL_TEXTURE_2D, 0)
+    }
+
     private fun createIndexBufferData(bufferObject: IndexBuffer) {
         val data = bufferObject.data()
         bindBufferObject(bufferObject)
@@ -181,6 +185,10 @@ class GLFWOpenGLContext : RendererContext {
         }
 
         glDrawElements(GL_TRIANGLES, vertexArrayObject.size, GL_UNSIGNED_INT, 0)
+    }
+
+    override fun setUniformMatrix3fv(location: Int, transpose: Boolean, fb: FloatBuffer) {
+        glUniformMatrix4fv(location, transpose, fb)
     }
 
     override fun setUniformMatrix4fv(location: Int, transpose: Boolean, fb: FloatBuffer) {
