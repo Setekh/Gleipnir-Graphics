@@ -169,7 +169,7 @@ class DesktopApp(
 
     override fun onReady() {
         val sceneGraph by inject<SceneGraph>()
-        sceneGraph.loadScene("test-models/suz.dae")
+        sceneGraph.loadScene("test-models/standford_buns.dae")
 
         val action = { mapping: String, event: InputEvent ->
             val spatial = sceneGraph.sceneTree.children[0] as Spatial
