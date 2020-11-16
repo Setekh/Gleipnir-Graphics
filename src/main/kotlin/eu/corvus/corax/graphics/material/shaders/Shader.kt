@@ -4,6 +4,7 @@ import eu.corvus.corax.graphics.context.RendererContext
 import eu.corvus.corax.scene.Object
 import org.joml.Matrix4fc
 import org.joml.Vector3fc
+import org.joml.Vector4fc
 import org.koin.core.inject
 import org.lwjgl.system.MemoryStack
 
@@ -52,6 +53,10 @@ abstract class Shader: Object() {
 
     class Vec3fUniform(name: String) : Uniform<Vector3fc>(name) {
         override fun setValue(rendererContext: RendererContext, value: Vector3fc) = rendererContext.setUniform3f(uniformLocation, value)
+    }
+
+    class Vec4fUniform(name: String) : Uniform<Vector4fc>(name) {
+        override fun setValue(rendererContext: RendererContext, value: Vector4fc) = rendererContext.setUniform4f(uniformLocation, value)
     }
 
     class Mat4fUniform(name: String) : Uniform<Matrix4fc>(name) {

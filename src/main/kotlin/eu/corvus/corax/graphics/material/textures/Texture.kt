@@ -43,6 +43,10 @@ import java.nio.IntBuffer
 
 /**
  * @author Vlad Ravenholm on 12/28/2019
+ *
+ * TODO:
+ *  - Track how many refs it has
+ *  - Add filtering, and wrapping settings
  */
 abstract class Texture: Object() {
     open var id: Int = 0

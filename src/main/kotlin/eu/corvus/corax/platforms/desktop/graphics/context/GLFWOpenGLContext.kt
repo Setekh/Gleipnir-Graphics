@@ -17,6 +17,7 @@ import eu.corvus.corax.utils.component1
 import eu.corvus.corax.utils.component2
 import kotlinx.coroutines.runBlocking
 import org.joml.Vector3fc
+import org.joml.Vector4fc
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL13
 import org.lwjgl.opengl.GL15
@@ -192,6 +193,10 @@ class GLFWOpenGLContext : RendererContext {
 
     override fun setUniform3f(location: Int, value: Vector3fc) {
         glUniform3f(location, value.x(), value.y(), value.z())
+    }
+
+    override fun setUniform4f(location: Int, value: Vector4fc) {
+        glUniform4f(location, value.x(), value.y(), value.z(), value.w())
     }
 
     override fun setUniform1i(location: Int, value: Int) {

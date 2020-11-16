@@ -37,6 +37,7 @@ import org.joml.Vector2i
 import org.lwjgl.stb.STBImage.stbi_failure_reason
 import org.lwjgl.stb.STBImage.stbi_load_from_memory
 import org.lwjgl.system.MemoryStack
+import org.lwjgl.system.MemoryUtil
 import java.nio.Buffer
 
 
@@ -50,7 +51,9 @@ class TextureLoader : AssetManager.AssetLoader {
         storageAccess.readFrom(path) { stream ->
             MemoryStack.stackPush().use { stack ->
                 val readBytes = stream.readBytes()
-                val buffer = stack.malloc(readBytes.size)
+
+                val buffer = MemoryUtil.memAlloc(readBytes.size)
+                //val buffer = stack.malloc(readBytes.size)
                 buffer.put(readBytes).flip()
 
                 val w = stack.mallocInt(1)

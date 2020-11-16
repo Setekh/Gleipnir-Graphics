@@ -37,6 +37,7 @@ import eu.corvus.corax.graphics.material.textures.Texture
 import eu.corvus.corax.scene.Object
 import eu.corvus.corax.scene.assets.AssetManager
 import org.joml.Vector3fc
+import org.joml.Vector4fc
 import java.nio.FloatBuffer
 
 /**
@@ -88,6 +89,7 @@ interface RendererContext {
 
     fun setUniformMatrix4fv(location: Int, transpose: Boolean, fb: FloatBuffer): Unit
     fun setUniform3f(location: Int, value: Vector3fc)
+    fun setUniform4f(location: Int, value: Vector4fc)
     fun setUniform1f(location: Int, value: Float)
     fun getUniformLocation(programId: Int, name: String): Int
     fun setUniform1i(location: Int, value: Int)
