@@ -54,9 +54,9 @@ import java.io.File
  * GLFW app for desktop uses
  */
 class DesktopApp(
-    title: String = "App Window",
-    private val input: Input
-    ): GleipnirApplication(title) {
+        title: String = "App Window",
+        private val input: Input
+) : GleipnirApplication(title) {
     // The window handle
     private var window: Long = 0
 
@@ -102,21 +102,26 @@ class DesktopApp(
             if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
                 glfwSetWindowShouldClose(window, true) // We will detect this in the rendering loop
 
-            // TODO need to queue this and make them in sync with the main loop, to access delta time
-            input.keyPress(key, when(action) {
-                GLFW_PRESS -> InputEvent.Pressed
-                GLFW_RELEASE -> InputEvent.Released
-                GLFW_REPEAT -> InputEvent.Repeat
-                else -> error("Unk action! $action")
-            })
+            appScope.launch {
+                input.keyPress(key, when (action) {
+                    GLFW_PRESS -> InputEvent.Pressed
+                    GLFW_RELEASE -> InputEvent.Released
+                    GLFW_REPEAT -> InputEvent.Repeat
+                    else -> error("Unk action! $action")
+                })
+            }
         }
 
         glfwSetMouseButtonCallback(window) { window, button, action, mods ->
-            input.mousePress(button, if (action > 0) InputEvent.Pressed else InputEvent.Released)
+            appScope.launch {
+                input.mousePress(button, if (action > 0) InputEvent.Pressed else InputEvent.Released)
+            }
         }
 
         glfwSetCursorPosCallback(window) { window, xpos, ypos ->
-            input.mouseMotion(width, height, xpos.toFloat(), ypos.toFloat())
+            appScope.launch {
+                input.mouseMotion(width, height, xpos.toFloat(), ypos.toFloat())
+            }
         }
 
         glfwSetFramebufferSizeCallback(window) { window: Long, width: Int, height: Int ->
@@ -136,9 +141,9 @@ class DesktopApp(
 
             // Center the window
             glfwSetWindowPos(
-                window,
-                (vidmode!!.width() - pWidth.get(0)) / 2,
-                (vidmode.height() - pHeight.get(0)) / 2
+                    window,
+                    (vidmode!!.width() - pWidth.get(0)) / 2,
+                    (vidmode.height() - pHeight.get(0)) / 2
             )
         } // the stack frame is popped automatically
 
