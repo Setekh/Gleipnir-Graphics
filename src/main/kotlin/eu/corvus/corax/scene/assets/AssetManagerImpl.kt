@@ -3,13 +3,16 @@ package eu.corvus.corax.scene.assets
 import eu.corvus.corax.app.storage.StorageAccess
 import eu.corvus.corax.graphics.material.textures.Texture
 import eu.corvus.corax.graphics.material.textures.Texture2D_PC
-import eu.corvus.corax.scene.Object
-import eu.corvus.corax.scene.Spatial
 import eu.corvus.corax.platforms.desktop.assets.loaders.AssimpLoader
 import eu.corvus.corax.platforms.desktop.assets.loaders.TextureLoader
+import eu.corvus.corax.scene.Object
+import eu.corvus.corax.scene.Spatial
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.lang.RuntimeException
+import java.io.File
+import java.nio.file.FileSystems
+import java.nio.file.StandardWatchEventKinds
+import java.nio.file.WatchKey
 import kotlin.properties.Delegates
 
 class AssetManagerImpl(
@@ -52,6 +55,31 @@ class AssetManagerImpl(
         }
 
         data
+    }
+
+    override fun watch(assetPath: File, callback: () -> Unit): WatchKey {
+        val watchService = FileSystems.getDefault().newWatchService()
+        val pathToWatch = assetPath.toPath()
+
+        val pathKey = pathToWatch.register(watchService,
+            StandardWatchEventKinds.ENTRY_MODIFY)
+
+        while (true) {
+            val watchKey = watchService.take()
+
+            for (event in watchKey.pollEvents()) {
+                callback()
+            }
+
+            if (!watchKey.reset()) {
+                watchKey.cancel()
+                watchService.close()
+                break
+            }
+        }
+
+        return pathKey
+
     }
 
     override fun unload(assetName: String) {

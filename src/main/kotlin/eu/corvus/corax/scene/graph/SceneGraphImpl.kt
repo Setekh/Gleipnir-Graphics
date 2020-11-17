@@ -35,6 +35,7 @@ import eu.corvus.corax.graphics.context.RendererContext
 import eu.corvus.corax.scene.*
 import eu.corvus.corax.scene.assets.AssetManager
 import eu.corvus.corax.scene.geometry.Geometry
+import eu.corvus.corax.scripts.ScriptManager
 import eu.corvus.corax.utils.ItemBuffer
 import eu.corvus.corax.utils.Logger
 import eu.corvus.corax.utils.toRadians
@@ -46,7 +47,8 @@ import org.koin.core.get
  */
 class SceneGraphImpl(
     private val rendererContext: RendererContext,
-    private val assetManager: AssetManager
+    private val assetManager: AssetManager,
+    private val scriptManager: ScriptManager
 ) : SceneGraph, Object() {
     override val sceneTree: Node = Node("Scene Tree")
     override val renderBuffer: ItemBuffer<Geometry> = ItemBuffer()
@@ -79,11 +81,16 @@ class SceneGraphImpl(
 
                 transform.translation.set(0f, 0f, -5f)
                 sceneTree.appendChild(this)
+                scriptManager.onGraphReady()
             })
         }
     }
 
     override fun loadScene(path: String) {
+        if (lastLoadPath.isNotEmpty()) {
+            scriptManager.onGraphDestroy()
+        }
+
         lastLoadPath = path
 
         sceneTree.removeChildren()
@@ -91,6 +98,7 @@ class SceneGraphImpl(
         loadJob = sceneScope.launch {
             isRenderReady = false
 
+            Logger.info("Loading scene $path")
             val spatial = assetManager.loadSpatial(path)
             sceneTree.appendChild(spatial)
 
@@ -102,6 +110,8 @@ class SceneGraphImpl(
 
             if (!isRenderReady)
                 Logger.warn("Nothing to render with!")
+
+            Logger.info("Scene loaded")
         }
     }
 
@@ -121,6 +131,8 @@ class SceneGraphImpl(
     }
 
     override fun prepareGraph(camera: Camera, tpf: Float) {
+        scriptManager.onGraphUpdate(tpf)
+
         // todo check cull hint for camera
         renderBuffer.clear()
 
@@ -156,5 +168,6 @@ class SceneGraphImpl(
         super.free()
 
         job.cancel()
+        scriptManager.onGraphDestroy()
     }
 }

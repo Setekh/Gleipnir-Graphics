@@ -33,6 +33,8 @@ import eu.corvus.corax.graphics.Renderer
 import eu.corvus.corax.graphics.context.RendererContext
 import eu.corvus.corax.scene.graph.SceneGraph
 import eu.corvus.corax.utils.Logger
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import org.lwjgl.opengl.GL11
@@ -45,6 +47,8 @@ import java.util.*
 abstract class GleipnirApplication(
     val title: String
 ): KoinComponent {
+    protected val appScope = MainScope()
+
     val renderer: Renderer by inject()
     val rendererContext: RendererContext by inject()
     val sceneGraph: SceneGraph by inject()
@@ -134,6 +138,7 @@ abstract class GleipnirApplication(
             Logger.error(e, "Fatal crash!")
         } finally {
             onDestroy()
+            appScope.cancel()
         }
     }
 

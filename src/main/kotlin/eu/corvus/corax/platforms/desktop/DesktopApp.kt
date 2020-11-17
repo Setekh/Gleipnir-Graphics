@@ -29,15 +29,14 @@
  */
 package eu.corvus.corax.platforms.desktop
 
-import eu.corvus.corax.app.Device
 import eu.corvus.corax.app.GleipnirApplication
 import eu.corvus.corax.app.Input
 import eu.corvus.corax.app.InputEvent
-import eu.corvus.corax.scene.Spatial
-import eu.corvus.corax.scene.graph.SceneGraph
+import eu.corvus.corax.scene.assets.AssetManager
+import eu.corvus.corax.scripts.ScriptManager
 import eu.corvus.corax.utils.Logger
-import org.joml.Vector2f
-import org.joml.Vector3f
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.koin.core.inject
 import org.lwjgl.Version
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
@@ -48,6 +47,7 @@ import org.lwjgl.opengl.GL30.GL_TRUE
 import org.lwjgl.system.MemoryStack.stackPush
 import org.lwjgl.system.MemoryUtil.NULL
 import org.lwjgl.system.Platform
+import java.io.File
 
 /**
  * GLFW app for desktop uses
@@ -169,41 +169,14 @@ class DesktopApp(
         }
     }
 
-    var moving = Vector2f() // FIXME this dirtiness is here cause we don't have scripts yet
     override fun onReady() {
-        val sceneGraph by inject<SceneGraph>()
-        sceneGraph.loadScene("test-models/standford_buns.dae")
-
-        val action = { mapping: String, event: InputEvent ->
-            val isReleased = event == InputEvent.Released
-            when (mapping) {
-                "turn left" -> moving.x = if (isReleased) 0f else -1f
-                "turn up" -> moving.y =  if (isReleased) 0f else 1f
-                "turn right" -> moving.x =  if (isReleased) 0f else 1f
-                "turn down" -> moving.y =  if (isReleased) 0f else -1f
-            }
+        appScope.launch {
+            val scriptManager by inject<ScriptManager>()
+            scriptManager.loadScript("scripts/start-script.kts")
         }
-
-        input.map(Device.Keyboard, GLFW_KEY_LEFT, "turn left", action)
-        input.map(Device.Keyboard, GLFW_KEY_UP, "turn up", action)
-        input.map(Device.Keyboard, GLFW_KEY_RIGHT, "turn right", action)
-        input.map(Device.Keyboard, GLFW_KEY_DOWN, "turn down", action)
 
         // TODO config this
         //glEnable(GL_MULTISAMPLE)
-    }
-
-    override fun onUpdate(tpf: Float) {
-        val speed = 20
-        val amount = 10.0
-
-        if (sceneGraph.sceneTree.children.isNotEmpty()) {
-            val spatial = sceneGraph.sceneTree.children[0] as Spatial
-            spatial.transform.rotation.rotateY(Math.toRadians(amount * moving.x.toDouble()).toFloat() * speed * tpf)
-            spatial.transform.rotation.rotateX(Math.toRadians(amount * moving.y.toDouble()).toFloat() * speed * tpf)
-            spatial.forceUpdate()
-        }
-        super.onUpdate(tpf)
     }
 
     override fun live() {

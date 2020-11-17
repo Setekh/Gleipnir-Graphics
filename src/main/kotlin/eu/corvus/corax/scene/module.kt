@@ -29,12 +29,14 @@
  */
 package eu.corvus.corax.scene
 
+import eu.corvus.corax.platforms.desktop.scripts.KtScriptManager
 import eu.corvus.corax.scene.assets.AssetManager
 import eu.corvus.corax.scene.assets.AssetManagerImpl
 import eu.corvus.corax.scene.graph.SceneGraph
 import eu.corvus.corax.scene.graph.SceneGraphImpl
 import eu.corvus.corax.scene.pool.ObjectPool
 import eu.corvus.corax.scene.pool.ObjectPoolImpl
+import eu.corvus.corax.scripts.ScriptManager
 import org.koin.dsl.module
 
 /**
@@ -42,6 +44,7 @@ import org.koin.dsl.module
  */
 val sceneGraphModules = module {
     single<AssetManager> { AssetManagerImpl(get()) }
-    single<SceneGraph> { SceneGraphImpl(get(), get()) }
+    single<SceneGraph> { SceneGraphImpl(get(), get(), get()) }
     single<ObjectPool> { ObjectPoolImpl() }
+    single<ScriptManager> { KtScriptManager(get()) }
 }

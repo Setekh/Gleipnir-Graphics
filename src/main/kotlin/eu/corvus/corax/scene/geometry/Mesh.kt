@@ -9,7 +9,7 @@ import eu.corvus.corax.graphics.buffers.VertexArrayObject
  * Should contain bound information
  *
  */
-class Mesh(name: String = "Mesh") : Geometry(name) {
+open class Mesh(name: String = "Mesh") : Geometry(name) {
     override var vertexArrayObject: VertexArrayObject? = null
 
     fun createSimple(vertexArray: FloatArray, indices: IntArray, texCoords: FloatArray? = null): Mesh {

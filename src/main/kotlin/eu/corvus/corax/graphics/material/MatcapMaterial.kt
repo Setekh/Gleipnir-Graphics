@@ -47,7 +47,8 @@ import org.koin.core.KoinComponent
 class MatcapMaterial(val matcapTexture: MatcapTexture = MatcapTexture.MatcapBlue): Material(), KoinComponent {
     enum class MatcapTexture(val texturePath: String) {
         MatcapBlue("textures/matcap.png"),
-        MatcapBrown("textures/matcap2.png")
+        MatcapBrown("textures/matcap2.png"),
+        Matcap3("textures/matcap3.png")
     }
 
     override val shader = MatcapShader()

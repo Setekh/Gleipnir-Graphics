@@ -33,6 +33,8 @@ import eu.corvus.corax.app.storage.StorageAccess
 import eu.corvus.corax.graphics.material.textures.Texture
 import eu.corvus.corax.scene.Object
 import eu.corvus.corax.scene.Spatial
+import java.io.File
+import java.nio.file.WatchKey
 
 /**
  * @author Vlad Ravenholm on 12/28/2019
@@ -45,10 +47,12 @@ interface AssetManager {
     suspend fun loadSpatial(assetName: String): Spatial
     suspend fun loadTexture(assetName: String): Texture
     suspend fun loadRaw(assetPath: String): ByteArray
+    fun watch(assetPath: File, callback: () -> Unit): WatchKey
 
     fun unload(assetName: String)
 
     interface AssetLoader {
         suspend fun load(assetManager: AssetManager, storageAccess: StorageAccess, path: String): Object
     }
+
 }

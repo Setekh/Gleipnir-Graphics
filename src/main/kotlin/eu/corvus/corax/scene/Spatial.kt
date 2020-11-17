@@ -1,6 +1,7 @@
 
 package eu.corvus.corax.scene
 
+import eu.corvus.corax.scripts.Script
 import org.joml.Matrix4f
 
 /**
@@ -59,6 +60,8 @@ open class Spatial(name: String = "Spatial") : Node(name) {
 
     fun update(tpf: Float) {
         val shouldUpdate = onUpdate(tpf)
+        script?.onUpdate(tpf)
+
         if (alwaysCompute || shouldCompute || shouldUpdate) {
             computeWorldTransform()
         }
