@@ -2,8 +2,7 @@
 
 uniform mat4 viewProjectionMatrix;
 uniform mat4 modelMatrix;
-uniform mat4 viewMatrix;
-//uniform mat4 normalMatrix;
+uniform mat4 normalMatrix;
 
 uniform vec3 eye;
 
@@ -20,5 +19,5 @@ void main() {
 
     peye = eye;
 
-    norm = normalize((viewMatrix * modelMatrix * vec4(normal, 0.0)).xyz);
+    norm = normalize((normalMatrix * vec4(normal, 0.0)).xyz);
 }

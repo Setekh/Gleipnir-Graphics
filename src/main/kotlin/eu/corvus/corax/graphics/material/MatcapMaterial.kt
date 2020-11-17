@@ -44,13 +44,17 @@ import org.koin.core.KoinComponent
 /**
  * @author Vlad Ravenholm on 1/6/2020
  */
-class MatcapMaterial: Material(), KoinComponent {
+class MatcapMaterial(val matcapTexture: MatcapTexture = MatcapTexture.MatcapBlue): Material(), KoinComponent {
+    enum class MatcapTexture(val texturePath: String) {
+        MatcapBlue("textures/matcap.png"),
+        MatcapBrown("textures/matcap2.png")
+    }
+
     override val shader = MatcapShader()
     var texture: Texture? = null
     var isLoadingTexture = false
 
-    private val tempMatrix = Matrix4f()
-    private val normalMatrix = Matrix3f()
+    private val normalMatrix = Matrix4f()
 
     override fun applyParams(
         renderContext: RendererContext,
@@ -59,11 +63,11 @@ class MatcapMaterial: Material(), KoinComponent {
     ) {
         shader.setUniformValue(shader.viewProjection, camera.viewProjectionMatrix)
         shader.setUniformValue(shader.modelMatrix, geometry.worldMatrix)
-        shader.setUniformValue(shader.viewMatrix, camera.viewMatrix)
         shader.setUniformValue(shader.eye, camera.dir)
 
-        val GG = tempMatrix.set(camera.viewMatrix).mul(geometry.worldMatrix).invert().transpose()
-        shader.setUniformValue(shader.normalMatrix, GG)
+        normalMatrix.set(camera.viewMatrix).mul(geometry.worldMatrix).invert().transpose()
+
+        shader.setUniformValue(shader.normalMatrix, normalMatrix)
 
         val texture = texture ?: return
         shader.setUniformValue(shader.texture, 0)
@@ -83,7 +87,7 @@ class MatcapMaterial: Material(), KoinComponent {
             isLoadingTexture = true
 
             scope.launch {
-                this@MatcapMaterial.texture = assetManager.loadTexture("textures/matcap2.png")
+                this@MatcapMaterial.texture = assetManager.loadTexture(matcapTexture.texturePath)
             }
         }
 
