@@ -19,8 +19,6 @@ class KtScriptManager(val assetManager: AssetManager): ScriptManager {
     private var scriptEngine: ScriptEngine
     private val scriptables = mutableListOf<Scriptable>()
 
-    private val scripts = ConcurrentHashMap<String, Script<*>>()
-
     init {
         val t1 = System.currentTimeMillis()
 
@@ -41,13 +39,13 @@ class KtScriptManager(val assetManager: AssetManager): ScriptManager {
         val result = scriptEngine.eval(String(bytes, Charset.defaultCharset()))
         Logger.info("Loaded script[$path] in ${System.currentTimeMillis() - t1} ms")
 
-        if (result is Scriptable) {
+        if (result is SceneGraphScript) {
             scriptables.add(result)
         }
 
         val scriptables = result as? List<Scriptable>
         if (scriptables != null) {
-            this.scriptables.addAll(scriptables)
+            this.scriptables.addAll(scriptables.filterIsInstance<SceneGraphScript>())
         }
 
         return result

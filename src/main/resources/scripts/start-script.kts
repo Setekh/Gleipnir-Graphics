@@ -45,8 +45,8 @@ lateinit var spatial: Spatial
 
 val onReady = Ready {
     spatial = sceneGraph.sceneTree.children[0] as Spatial
-    MainScope().launch { // TODO Look into scriptContext DSL
-        val script = scriptManager.loadScript("scripts/SpatialScript.kts") as Script<*>
+    MainScope().launch {
+        val script = scriptManager.loadScript("scripts/rotate-spatial-script.kts") as Script<*>
         spatial.script = script
     }
 }
