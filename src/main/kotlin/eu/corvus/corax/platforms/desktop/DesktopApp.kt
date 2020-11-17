@@ -37,6 +37,7 @@ import eu.corvus.corax.scripts.ScriptManager
 import eu.corvus.corax.utils.Logger
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.koin.core.get
 import org.koin.core.inject
 import org.lwjgl.Version
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
@@ -60,6 +61,7 @@ class DesktopApp(
     private var window: Long = 0
 
     init {
+        get<ScriptManager>() // warmup scripting
         Logger.info("LWJGL ${Version.getVersion()} GLFW ${glfwGetVersionString()}!")
     }
 
