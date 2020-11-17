@@ -4,7 +4,7 @@ out vec4 fragColor;
 in vec3 norm;
 in vec3 peye;
 
-uniform sampler2D texture;
+uniform sampler2D m_texture;
 
 vec2 matcap(vec3 eye, vec3 normal) {
     vec3 reflected = reflect(eye, normal);
@@ -13,6 +13,6 @@ vec2 matcap(vec3 eye, vec3 normal) {
 }
 void main() {
     vec2 uv = matcap(peye, norm);
-    vec3 color = texture(texture, uv).rgb;
+    vec3 color = texture(m_texture, uv).rgb;
     fragColor = vec4(color, 1.0);
 }

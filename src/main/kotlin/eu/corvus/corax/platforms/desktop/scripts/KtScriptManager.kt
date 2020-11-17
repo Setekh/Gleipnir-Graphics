@@ -5,6 +5,7 @@ import eu.corvus.corax.scene.assets.AssetManager
 import eu.corvus.corax.scripts.*
 import eu.corvus.corax.utils.Logger
 import kotlinx.coroutines.runBlocking
+import org.jetbrains.kotlin.cli.common.environment.setIdeaIoUseFallback
 import java.nio.charset.Charset
 import java.util.concurrent.ConcurrentHashMap
 import javax.script.ScriptEngine
@@ -22,6 +23,9 @@ class KtScriptManager(val assetManager: AssetManager): ScriptManager {
 
     init {
         val t1 = System.currentTimeMillis()
+
+        setIdeaIoUseFallback()
+
         val manager = ScriptEngineManager()
         scriptEngine = manager.getEngineByExtension("kts")
 
