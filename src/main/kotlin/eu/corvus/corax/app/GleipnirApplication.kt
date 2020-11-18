@@ -49,6 +49,16 @@ abstract class GleipnirApplication(
 ): KoinComponent {
     protected val appScope = MainScope()
 
+    var hardwareMouse = HardwareMouseState.Normal
+        set(value) {
+            field = value
+            onChangeHardwareMouseState(value)
+        }
+
+    enum class HardwareMouseState {
+        Normal, Hidden, Disabled
+    }
+
     val renderer: Renderer by inject()
     val rendererContext: RendererContext by inject()
     val sceneGraph: SceneGraph by inject()
@@ -146,4 +156,5 @@ abstract class GleipnirApplication(
         enqueuedTasks.addLast(block)
     }
 
+    open fun onChangeHardwareMouseState(mouseState: HardwareMouseState) {}
 }

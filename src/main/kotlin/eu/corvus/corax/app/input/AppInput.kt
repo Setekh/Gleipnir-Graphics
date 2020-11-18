@@ -45,8 +45,8 @@ class AppInput: Input {
     private val keyMap: MutableMap<Int, String> = mutableMapOf()
     private val mouseMap: MutableMap<Int, String> = mutableMapOf()
 
-    val lastMousePosition = Vector2f()
-    val mousePositionDelta = Vector2f()
+    override val lastMousePosition = Vector2f()
+    override val mousePositionDelta = Vector2f()
 
     override fun keyPress(key: Int, event: InputEvent) {
         if (event == InputEvent.Repeat) return // not finding an use right now
@@ -84,5 +84,9 @@ class AppInput: Input {
         val key = keyMap.entries.find { it.value == mapping }?.key
         keyMap.remove(key)
         actions.remove(mapping)
+    }
+
+    override fun clear() {
+        mousePositionDelta.zero()
     }
 }

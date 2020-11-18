@@ -190,6 +190,7 @@ class DesktopApp(
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
         while (!glfwWindowShouldClose(window)) {
+            input.clear()
             update()
 
             glfwSwapBuffers(window) // swap the color buffers
@@ -197,6 +198,14 @@ class DesktopApp(
             // Poll for window events. The key callback above will only be
             // invoked during this call.
             glfwPollEvents()
+        }
+    }
+
+    override fun onChangeHardwareMouseState(mouseState: HardwareMouseState) {
+        when (mouseState) {
+            HardwareMouseState.Normal -> glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL)
+            HardwareMouseState.Hidden -> glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN)
+            HardwareMouseState.Disabled -> glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
         }
     }
 

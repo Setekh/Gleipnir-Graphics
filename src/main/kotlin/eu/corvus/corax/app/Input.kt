@@ -29,6 +29,8 @@
  */
 package eu.corvus.corax.app
 
+import org.joml.Vector2f
+
 /**
  * @author Vlad Ravenholm on 11/30/2019
  */
@@ -43,9 +45,15 @@ interface Input {
 
     fun mousePress(button: Int, event: InputEvent)
     fun mouseMotion(width: Int, height: Int, xpos: Float, ypos: Float)
+    fun clear()
+
+    val lastMousePosition: Vector2f
+    val mousePositionDelta: Vector2f
 }
 
 enum class InputEvent { Pressed, Released, Repeat, Motion }
 
 enum class Device { Keyboard, Mouse, Controller }
-typealias InputAction = (mapping: String, event: InputEvent) -> Unit
+fun interface InputAction {
+    fun invoke(mapping: String, event: InputEvent)
+}
