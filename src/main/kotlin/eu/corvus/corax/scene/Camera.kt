@@ -18,6 +18,8 @@ open class Camera(name: String = "Camera") : Spatial(name) {
     val projectionMatrix = Matrix4f()
     val viewProjectionMatrix = Matrix4f()
 
+    //TODO Frustrums
+
     var isPerspective = false
         private set
 
@@ -61,7 +63,7 @@ open class Camera(name: String = "Camera") : Spatial(name) {
         val cameraPos = worldTransform.translation
         val rotation = worldTransform.rotation
 
-        viewMatrix.identity().rotate(rotation).translate(cameraPos.x, cameraPos.y, cameraPos.z)
+        viewMatrix.identity().rotate(rotation).translate(cameraPos.mul(-1f))
         viewProjectionMatrix.set(projectionMatrix).mul(viewMatrix)
     }
 }

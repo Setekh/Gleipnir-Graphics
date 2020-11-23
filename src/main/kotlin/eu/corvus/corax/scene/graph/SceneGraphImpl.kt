@@ -79,7 +79,7 @@ class SceneGraphImpl(
                 useAsPerspective(70f.toRadians(), width / height.toFloat())
                 updateResize(width, height)
 
-                transform.translation.set(0f, 0f, -5f)
+                transform.translation.set(0f, 0f, 5f)
                 sceneTree.appendChild(this)
                 scriptManager.onGraphReady()
             })
